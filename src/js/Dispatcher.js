@@ -14,6 +14,7 @@ export default assign(new Dispatcher(), {
    * to server-originated events and treat them differently...
    **/
   handleServerAction(action) {
+    console.log(action)
     this.dispatch({
       source: Constants.ActionSources.SERVER_ACTION,
       action: action
