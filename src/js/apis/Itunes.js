@@ -1,10 +1,10 @@
-import jQuery from 'jquery';
-let url = 'https://itunes.apple.com'
+import ajax from 'reqwest';
+let URL = 'https://itunes.apple.com'
 
 export default {
-  search(query = '') {
-    url = url + '/search?term=' + query
-    return jQuery.ajax({url: url, dataType: "jsonp"})
+  search(query = 'Jo') {
+    let url = URL + '/search?term=' + query + '&media=musicVideo&limit=5'
+    return ajax({url: url, method: 'get', type: 'jsonp'})
   }
 }
 

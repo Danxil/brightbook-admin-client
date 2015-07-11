@@ -13,7 +13,8 @@ function addItems(items) {
 const ItemStore = assign({}, BaseStore, {
   getAll() {
     return {
-      items: _data
+      items: _data,
+      loading: this.loading
     };
   },
 
@@ -22,20 +23,20 @@ const ItemStore = assign({}, BaseStore, {
 
     switch(action.type) {
       case Constants.ActionTypes.START_LOAD_ITEMS:
-        this.loading = true
+        ItemStore.loading = true
 
         ItemStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_LOAD_ITEMS:
-
         addItems(action.items)
-        this.loading = false
+        ItemStore.loading = false
 
         ItemStore.emitChange()
 
         break;
     }
+    console.log('end: ' + action.type)
   })
 });
 

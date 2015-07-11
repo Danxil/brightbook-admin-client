@@ -1,7 +1,7 @@
 import React from 'react';
 import TodoStore from '../stores/ItemsStore';
 import ActionCreator from '../actions/ItemsActionCreators';
-import App from './App.jsx';
+import ItemsList from './ItemsList.jsx';
 
 export default React.createClass({
   getDefaultProps() {
@@ -11,6 +11,7 @@ export default React.createClass({
   },
 
   _onChange() {
+    console.log(1)
     this.setState(TodoStore.getAll());
   },
 
@@ -29,9 +30,16 @@ export default React.createClass({
   },
 
   render() {
-    let {items} = this.state;
+    let {items, loading} = this.state;
+
     return (
-      <App items={items} />
+        <div className="container">
+          <div className="page-header">
+            <h1>Example page header</h1>
+          </div>
+
+          <ItemsList items={items} loading={loading} />
+        </div>
     );
   }
 });
