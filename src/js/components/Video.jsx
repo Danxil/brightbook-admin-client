@@ -16,9 +16,11 @@ export default React.createClass({
 
     return (
       <div className="embed-responsive embed-responsive-16by9">
-        <video className="embed-responsive-item" onClick={this.playVideoHndler}>
-          <source src={src} type="video/mp4" />
-        </video>
+        <a href="#">
+          <video className="embed-responsive-item" onClick={this.playVideoHndler} preload="none" poster="https://developers.google.com/youtube/images/YouTube-icon-dark.png">
+            <source src={src} type="video/mp4" />
+          </video>
+        </a>
       </div>
     );
   }

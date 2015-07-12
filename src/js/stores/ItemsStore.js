@@ -4,39 +4,48 @@ import BaseStore from './BaseStore';
 import assign from 'object-assign';
 import _ from 'underscore';
 
-let _data = [];
+let _model = {
+  items: [],
+  page: 1,
+  loading: false,
+  searchString: '',
+  fullItems: false
+}
+
 
 function addItems(items) {
-  _data = _.union(_data, items)
+  if (_model.page == 1)
+    _model.items = items
+  else
+    _model.items = _.union(_model.items, items)
 }
 
 const ItemStore = assign({}, BaseStore, {
   getAll() {
-    return {
-      items: _data,
-      loading: this.loading
-    };
+    return _model;
   },
 
   dispatcherIndex: Dispatcher.register(function(payload) {
     let action = payload.action;
-
     switch(action.type) {
       case Constants.ActionTypes.START_LOAD_ITEMS:
-        ItemStore.loading = true
+        _model.loading = true
 
         ItemStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_LOAD_ITEMS:
+        _model.loading = false
+        _model.page = action.page
+        _model.searchString = action.searchString
+        _model.fullItems = action.items.length < 5
+
         addItems(action.items)
-        ItemStore.loading = false
 
         ItemStore.emitChange()
 
         break;
     }
-    console.log('end: ' + action.type)
   })
 });
 

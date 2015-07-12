@@ -1,44 +1,36 @@
 import React from 'react';
-import TodoStore from '../stores/ItemsStore';
+import ItemsStore from '../stores/ItemsStore';
 import ActionCreator from '../actions/ItemsActionCreators';
+import SearchString from './SearchString.jsx';
 import ItemsList from './ItemsList.jsx';
 
 export default React.createClass({
-  getDefaultProps() {
-    return {
-      items: []
-    };
+  getInitialState() {
+    return ItemsStore.getAll()
   },
 
   _onChange() {
-    console.log(1)
-    this.setState(TodoStore.getAll());
-  },
-
-  getInitialState() {
-    ActionCreator.loadItems()
-
-    return {}
+    this.setState(ItemsStore.getAll());
   },
 
   componentDidMount() {
-    TodoStore.addChangeListener(this._onChange);
+    ItemsStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
-    TodoStore.removeChangeListener(this._onChange);
+    ItemsStore.removeChangeListener(this._onChange);
   },
 
   render() {
-    let {items, loading} = this.state;
+    let {items, loading, searchString, page, fullItems} = this.state;
 
     return (
         <div className="container">
           <div className="page-header">
-            <h1>Example page header</h1>
+            <h1>Itunes search</h1>
           </div>
-
-          <ItemsList items={items} loading={loading} />
+          <SearchString searchString={searchString} />
+          <ItemsList items={items} page={page} searchString={searchString} loading={loading} fullItems={fullItems} />
         </div>
     );
   }

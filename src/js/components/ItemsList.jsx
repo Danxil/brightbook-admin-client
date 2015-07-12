@@ -6,33 +6,26 @@ import ActionCreator from '../actions/ItemsActionCreators';
 var InfiniteScroll = require('react-infinite-scroll')(React);
 
 export default React.createClass({
-  getDefaultProps() {
-    return {
-      items: [],
-      loading: true
-    };
-  },
-
   createItemsDom(items) {
     return items.map(item => <Item item={item} />)
   },
 
   loadMoreItemsHandler() {
-    console.log('load more')
-
-    //ActionCreator.loadItems()
+    //next tick
+    setTimeout(function() {
+      ActionCreator.loadItems(this.props.searchString, this.props.page + 1)
+    }.bind(this))
   },
 
   render() {
-    let {items} = this.props;
+    let {items, page} = this.props;
 
     return (
       <form>
         <ListGroup>
         <InfiniteScroll
-            pageStart="0"
             loadMore={this.loadMoreItemsHandler}
-            hasMore={!this.props.loading}
+            hasMore={!this.props.loading && !this.props.fullItems}
             loader={<div className="loader">Loading ...</div>}>
             {this.createItemsDom(items)}
         </InfiniteScroll>

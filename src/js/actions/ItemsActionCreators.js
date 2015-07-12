@@ -3,17 +3,16 @@ import Constants from '../Constants';
 import Itunes from '../apis/Itunes';
 
 export default {
-  loadItems(query) {
-    console.log('start: ' + Constants.ActionTypes.START_LOAD_ITEMS)
+  loadItems(query, page) {
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_LOAD_ITEMS
     });
-
-    Itunes.search(query).then(function(response) {
-      console.log('start: ' + Constants.ActionTypes.SUCCESS_LOAD_ITEMS)
+    Itunes.search(query, page).then(function(response) {
       Dispatcher.handleServerAction({
         type: Constants.ActionTypes.SUCCESS_LOAD_ITEMS,
-        items: response.results
+        items: response.results,
+        page: page,
+        searchString: query
       });
     })
   }
