@@ -6,13 +6,17 @@ export default {
 
   // Each time you add an action, add it here... They should be past-tense
   ActionTypes: keyMirror({
-    START_LOAD_ITEMS: null,
-    SUCCESS_LOAD_ITEMS: null,
-    ERROR_LOAD_ITEMS: null
+    START_LOAD_CATEGORIES: null,
+    SUCCESS_LOAD_CATEGORIES: null,
+    ERROR_LOAD_CATEGORIES: null
   }),
 
   ActionSources: keyMirror({
     SERVER_ACTION: null,
     VIEW_ACTION: null
-  })
+  }),
+
+  ConfigSources: {
+    REST_BASE_URL: 'http://localhost:3000/v1'
+  }
 };
