@@ -8,7 +8,12 @@ export default {
   ActionTypes: keyMirror({
     START_LOAD_CATEGORIES: null,
     SUCCESS_LOAD_CATEGORIES: null,
-    ERROR_LOAD_CATEGORIES: null
+    START_ADD_CATEGORY: null,
+    SUCCESS_ADD_CATEGORY: null,
+    START_EDIT_CATEGORY: null,
+    SUCCESS_EDIT_CATEGORY: null,
+    START_DELETE_CATEGORY: null,
+    SUCCESS_DELETE_CATEGORY: null,
   }),
 
   ActionSources: keyMirror({

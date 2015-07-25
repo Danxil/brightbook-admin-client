@@ -8,7 +8,7 @@ export default React.createClass({
   getInitialState() {
     CategoriesActionCreators.loadCategories()
 
-    return CategoriesStore.getAll()
+    return {categories: CategoriesStore.getAll()}
   },
 
   createCategoriesDom(categories) {
@@ -16,7 +16,7 @@ export default React.createClass({
   },
 
   _onChange() {
-    this.setState(CategoriesStore.getAll());
+    this.setState({categories: CategoriesStore.getAll()});
   },
 
   componentDidMount() {

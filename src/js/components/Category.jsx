@@ -1,5 +1,7 @@
 import React from 'react';
 import 'react/addons';
+import {ListGroup, ListGroupItem} from 'react-bootstrap';
+import {Link} from 'react-router';
 
 export default React.createClass({
 
@@ -7,7 +9,9 @@ export default React.createClass({
     let {category} = this.props;
 
     return (
-      <h3>{category.name}</h3>
+    <Link to="edit-category" params={{id: category.id}} className="list-group-item">
+      {category.name}
+    </Link>
     );
   }
 });
