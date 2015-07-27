@@ -34,6 +34,14 @@ export default (function(vow){
         url: url,
         type: 'delete'
       })
-    }
+    },
+
+
+
+    getHeaderColors() {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/headercolor'
+
+      return jq.get(url)
+    },
   }
 })(vow)

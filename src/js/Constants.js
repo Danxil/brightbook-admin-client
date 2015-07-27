@@ -14,6 +14,8 @@ export default {
     SUCCESS_EDIT_CATEGORY: null,
     START_DELETE_CATEGORY: null,
     SUCCESS_DELETE_CATEGORY: null,
+    START_LOAD_HEADER_COLORS: null,
+    SUCCESS_LOAD_HEADER_COLORS: null
   }),
 
   ActionSources: keyMirror({

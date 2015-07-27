@@ -4,7 +4,6 @@ import {ListGroup, ListGroupItem} from 'react-bootstrap';
 import {Link} from 'react-router';
 
 export default React.createClass({
-
   render() {
     let {category} = this.props;
 
