@@ -23,15 +23,12 @@ export default React.createClass({
 
   _onChange() {
     this.setState(function(prev) {
-      let obj = {
-        form: prev.form,
-        headerColors: HeaderColorsStore.getAll()
-      }
+      prev.headerColors = HeaderColorsStore.getAll()  
 
-      if (obj.form && !!obj.form.headerColor.id)
-        obj.form.headerColor = obj.form.headerColor.id
+      if (prev.form && !!prev.form.headerColor.id)
+        prev.form.headerColor = prev.form.headerColor.id
 
-      return obj
+      return prev
     })
   },
 
@@ -63,7 +60,7 @@ export default React.createClass({
   },
 
   submit() {
-    CategoriesActionCreators.addCategory(this.state.form).then(function() {
+    CategoriesActionCreators.addCategory(this.refs.form.getDOMNode()).then(function() {
       this.transitionTo('categories')
     }.bind(this))
   },
@@ -77,19 +74,21 @@ export default React.createClass({
     let headerColorsDOM = headerColors.map(item => <option value={item.id}>{item.color}</option>)
 
     return (
-      <div>
+      <form enctype="multipart/form-data" ref="form">
         <h2>Add new category</h2>
         <Input
+          name="name"
           type='text'
           value={form.name}
           label='Enter category name'
           ref='name'
           onChange={this.nameChange} />
-        <Input type='select' value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
+        <Input name="headerColor" type='select' value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
+        <Input type="file" name="bg" help="Chose category image" />
         <Button bsStyle='primary' onClick={this.submit}>Add category</Button>
-      </div>
+      </form>
     );
   }
 });

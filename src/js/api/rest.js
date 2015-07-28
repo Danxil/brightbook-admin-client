@@ -1,4 +1,5 @@
 import jq from 'jquery'
+import fileUpload from 'blueimp-file-upload';
 import vow from 'vow'
 import Constants from '../Constants'
 
@@ -12,9 +13,26 @@ export default (function(vow){
     },
 
     addCategory(data) {
+      let def = vow.defer()
       let url = Constants.ConfigSources.REST_BASE_URL + '/category'
 
-      return jq.post(url, data)
+      //grab all form data
+      var formData = new FormData(data);
+
+      jq.ajax({
+        url: url,
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (result) {
+          def.resolve({data: result})
+        }
+      });
+
+
+      return def.promise()
     },
 
     editCategory(id, data) {

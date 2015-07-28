@@ -28,9 +28,9 @@ export default assign({}, EventEmitter.prototype, {
     }
   },
 
-  editItem(item) {
+  editItem(editedItem) {
     _.each(this._model, function(item, index) {
-      if (item[this._id] == item[this._id])
+      if (editedItem[this._id] == item[this._id])
         this._model[index] = item
     }.bind(this))
   },

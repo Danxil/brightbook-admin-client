@@ -24,6 +24,6 @@ export default {
   }),
 
   ConfigSources: {
-    REST_BASE_URL: 'http://localhost:3000/v1'
+    REST_BASE_URL: 'http://localhost:3000/api'
   }
 };
