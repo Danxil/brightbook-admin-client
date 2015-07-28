@@ -16,7 +16,6 @@ export default (function(vow){
       let def = vow.defer()
       let url = Constants.ConfigSources.REST_BASE_URL + '/category'
 
-      //grab all form data
       var formData = new FormData(data);
 
       jq.ajax({
@@ -29,20 +28,31 @@ export default (function(vow){
         success: function (result) {
           def.resolve({data: result})
         }
-      });
+      })
 
 
       return def.promise()
     },
 
     editCategory(id, data) {
+      let def = vow.defer()
       let url = Constants.ConfigSources.REST_BASE_URL + '/category/' + id
 
-      return jq.ajax({
+      var formData = new FormData(data);
+
+      jq.ajax({
         url: url,
-        type: 'put',
-        data: data
+        type: 'PUT',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (result) {
+          def.resolve({data: result})
+        }
       })
+
+      return def.promise()
     },
 
     deleteCategory(id) {

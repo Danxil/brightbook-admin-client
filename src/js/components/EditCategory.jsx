@@ -3,6 +3,7 @@ import CategoriesActionCreators from '../actions/CategoriesActionCreators.js';
 import HeaderColorsActionCreators from '../actions/HeaderColorsActionCreators.js';
 import CategoriesStore from '../stores/CategoriesStore';
 import HeaderColorsStore from '../stores/HeaderColorsStore';
+import UploadImage from './helpers/UploadImage.jsx';
 import {Button, Input, Modal} from 'react-bootstrap';
 import {Navigation} from 'react-router';
 
@@ -68,7 +69,7 @@ export default React.createClass({
   },
 
   submit() {
-    CategoriesActionCreators.editCategory(this.props.params.id, this.state.form).then(function() {
+    CategoriesActionCreators.editCategory(this.props.params.id, this.refs.form.getDOMNode()).then(function() {
       this.transitionTo('categories')
     }.bind(this))
   },
@@ -81,6 +82,13 @@ export default React.createClass({
     }.bind(this))
   },
 
+  deleteBg() {
+    this.setState(function(prev) {
+      prev.form.bg = null
+      return prev
+    })
+  },
+
   render() {
     let {form, headerColors} = this.state
 
@@ -90,17 +98,20 @@ export default React.createClass({
     let headerColorsDOM = headerColors.map(item => <option value={item.id}>{item.color}</option>)
 
     return (
-      <div>
+      <form ref="form">
         <h2>Edit category</h2>
         <Input
           type='text'
           value={form.name}
           label='Enter category name'
           ref='name'
+          name='name'
           onChange={this.nameChange} />
-        <Input type='select' value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
+        <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
+        <UploadImage onDeleteImg={this.deleteBg} name="bg" src={form.bg} help="Chose category image" label="Category image" />
+        <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Edit category</Button>
         <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete category</Button>
 
@@ -118,7 +129,7 @@ export default React.createClass({
             <Button bsStyle="primary" onClick={this.toggleDeleteModal}>Cancel</Button>
           </Modal.Footer>
         </Modal>
-      </div>
+      </form>
     );
   }
 });
