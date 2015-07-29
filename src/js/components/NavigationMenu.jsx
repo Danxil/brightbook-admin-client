@@ -12,6 +12,9 @@ export default React.createClass({
         <p>
           <Link to="/categories">Categories</Link>
         </p>
+        <p>
+          <Link to="/books">Books</Link>
+        </p>
       </div>
     );
   }

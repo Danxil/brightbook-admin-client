@@ -8,12 +8,32 @@ export default {
   ActionTypes: keyMirror({
     START_LOAD_CATEGORIES: null,
     SUCCESS_LOAD_CATEGORIES: null,
+    
     START_ADD_CATEGORY: null,
     SUCCESS_ADD_CATEGORY: null,
+    
     START_EDIT_CATEGORY: null,
     SUCCESS_EDIT_CATEGORY: null,
+    
     START_DELETE_CATEGORY: null,
     SUCCESS_DELETE_CATEGORY: null,
+
+    
+
+    START_LOAD_BOOKS: null,
+    SUCCESS_LOAD_BOOKS: null,
+
+    START_ADD_BOOK: null,
+    SUCCESS_ADD_BOOK: null,
+
+    START_EDIT_BOOK: null,
+    SUCCESS_EDIT_BOOK: null,
+
+    START_DELETE_BOOK: null,
+    SUCCESS_DELETE_BOOK: null,
+    
+    
+    
     START_LOAD_HEADER_COLORS: null,
     SUCCESS_LOAD_HEADER_COLORS: null
   }),

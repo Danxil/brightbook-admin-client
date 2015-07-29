@@ -5,6 +5,7 @@ import CategoriesStore from '../stores/CategoriesStore';
 import HeaderColorsStore from '../stores/HeaderColorsStore';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
+import UploadImage from './helpers/UploadImage.jsx';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -60,7 +61,10 @@ export default React.createClass({
   },
 
   submit() {
-    CategoriesActionCreators.addCategory(this.refs.form.getDOMNode()).then(function() {
+    var data = this.state.form
+    var form = this.refs.form.getDOMNode()
+
+    CategoriesActionCreators.addCategory(data, form).then(function() {
       this.transitionTo('categories')
     }.bind(this))
   },
@@ -74,7 +78,7 @@ export default React.createClass({
     let headerColorsDOM = headerColors.map(item => <option value={item.id}>{item.color}</option>)
 
     return (
-      <form enctype="multipart/form-data" ref="form">
+      <div>
         <h2>Add new category</h2>
         <Input
           name="name"
@@ -86,9 +90,10 @@ export default React.createClass({
         <Input name="headerColor" type='select' value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
-        <Input type="file" name="bg" help="Chose category image" />
+        <UploadImage ref="form" help="Chose category image" label="Category image" />
+        <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Add category</Button>
-      </form>
+      </div>
     );
   }
 });

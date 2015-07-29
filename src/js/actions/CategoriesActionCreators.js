@@ -18,30 +18,59 @@ export default {
     })
   },
 
-  addCategory(data) {
+  addCategory(data, form) {
+    var def = vow.defer()
+
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_ADD_CATEGORY
     })
 
-    return rest.addCategory(data).then(function(response) {
-      Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_ADD_CATEGORY,
-        category: response.data
-      });
+    rest.addCategory(data).then(function(response) {
+      rest.upload('category', response.data.id, 'bg', form).then(function(response) {
+        Dispatcher.handleServerAction({
+          type: Constants.ActionTypes.SUCCESS_ADD_CATEGORY,
+          category: response.data
+        })
+
+        def.resolve()
+      })
     })
+
+    return def.promise()
   },
 
-  editCategory(id, data) {
+  editCategory(id, data, form) {
+    var def = vow.defer()
+
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_EDIT_CATEGORY
     })
 
-    return rest.editCategory(id, data).then(function(response) {
+    var defArr = []
+
+    data.bg.forEach(function(item) {
+      let def = vow.defer()
+      defArr.push(def.promise())
+
+      if (item.delete)
+        rest.removeUpload('category', id, 'bg', item.id).then(function(response) {
+          def.resolve(response)
+        })
+    })
+
+    defArr.push(rest.upload('category', id, 'bg', form))
+    defArr.push(rest.editCategory(id, data))
+
+    vow.all(defArr).then(function(all) {
       Dispatcher.handleServerAction({
         type: Constants.ActionTypes.SUCCESS_EDIT_CATEGORY,
-        category: response.data
+        category: all[all.length - 1].data
       });
+
+      def.resolve()
     })
+
+    return def.promise()
   },
 
   deleteCategory(id) {
