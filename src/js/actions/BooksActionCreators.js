@@ -58,6 +58,7 @@ export default {
         })
     })
 
+
     defArr.push(rest.upload('book', id, 'image', form))
     defArr.push(rest.editBook(id, data))
 

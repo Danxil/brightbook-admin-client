@@ -5,6 +5,7 @@ import BooksStore from '../stores/BooksStore.js';
 import UploadImage from './helpers/UploadImage.jsx';
 import {Button, Input, Modal} from 'react-bootstrap';
 import {Navigation} from 'react-router';
+import Datepicker from './helpers/Datepicker.jsx';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -18,16 +19,9 @@ export default React.createClass({
 
     return {
       form: book,
+      datepicker: {},
       showDeleteModal: false
     }
-  },
-
-  valueChange(fieldName) {
-    this.setState(function(prev) {
-      prev.form[fieldName] = this.refs[fieldName].getValue()
-
-      return prev
-    })
   },
 
   _onChange() {
@@ -50,7 +44,7 @@ export default React.createClass({
   },
 
   submit() {
-    BooksActionCreators.editBook(this.props.params.id, this.state.form, this.refs.form.getDOMNode()).then(function() {
+    BooksActionCreators.editBook(this.props.params.id, this.state.form, this.refs.imagesForm.getDOMNode()).then(function() {
       this.transitionTo('books')
     }.bind(this))
   },
@@ -74,8 +68,25 @@ export default React.createClass({
     })
   },
 
+  valueChange(fieldName) {
+    this.setState(function(prev) {
+      prev.form[fieldName] = this.refs[fieldName].getValue()
+
+      return prev
+    })
+  },
+
+  dateChange(fieldName, date) {
+    this.setState(function(prev) {
+      prev.datepicker[fieldName] = date
+      prev.form[fieldName] = date.format('YYYY-MM-DD')
+
+      return prev
+    })
+  },
+
   render() {
-    let {form} = this.state
+    let {form, datepicker} = this.state
 
     if (!form)
       return(<div></div>)
@@ -85,41 +96,49 @@ export default React.createClass({
         <h2>Edit book</h2>
         <Input
           type='text'
+          min="0"
           value={form.name}
           label='Enter book name'
           ref="name"
           onChange={this.valueChange.bind(this, 'name')} />
         <Input
           type='number'
+          min="0"
           value={form.priceE}
           label='Enter electric book price'
           ref="priceE"
           onChange={this.valueChange.bind(this, 'priceE')} />
         <Input
           type='number'
+          min="0"
           value={form.priceA}
           label='Enter analog book price'
           ref="priceA"
           onChange={this.valueChange.bind(this, 'priceA')} />
         <Input
           type='number'
+          min="0"
           value={form.recommendRetailPrice}
           label='Enter recomend retail price'
           ref="recommendRetailPrice"
           onChange={this.valueChange.bind(this, 'recommendRetailPrice')} />
         <Input
           type='number'
+          min="0"
           value={form.length}
           label='Enter book length'
           ref="length"
           onChange={this.valueChange.bind(this, 'length')} />
         <Input
           type='number'
+          min="0"
           value={form.countReeditions}
           label='Enter reeditions count'
           ref="countReeditions"
           onChange={this.valueChange.bind(this, 'countReeditions')} />
-        <UploadImage ref="form" onDeleteImg={this.deleteFile} fieldName="images" image={form.images[0]} help="Chose book image" label="Book image" />
+
+        <Datepicker selected={datepicker.dateFirstEdition} fieldName="dateFirstEdition" onChange={this.dateChange} label="Date first edition"/>
+        <UploadImage ref="imagesForm" onDeleteImg={this.deleteFile} fieldName="images" image={form.images[0]} help="Chose book image" label="Book image" />
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>
         <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete book</Button>
