@@ -21,7 +21,6 @@ export default React.createClass({
 
     return {
       form: category,
-      deleteBg: [],
       showDeleteModal: false
     }
   },
@@ -85,9 +84,9 @@ export default React.createClass({
 
   deleteBg(id) {
     this.setState(function(prev) {
-      prev.form.bg.forEach(function(item, index) {
+      prev.form.bgs.forEach(function(item, index) {
         if (item.id == id)
-          prev.form.bg[index].delete = true
+          prev.form.bgs[index].delete = true
       })
 
       return prev
@@ -115,7 +114,7 @@ export default React.createClass({
         <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
-        <UploadImage ref="form" onDeleteImg={this.deleteBg} image={form.bg[0]} help="Chose category image" label="Category image" />
+        <UploadImage ref="form" onDeleteImg={this.deleteBg} image={form.bgs[0]} help="Chose category image" label="Category image" />
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Edit category</Button>
         <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete category</Button>

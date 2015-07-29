@@ -43,18 +43,15 @@ export default React.createClass({
 
   submit() {
     var data = this.state.form
-    var form = this.refs.form.getDOMNode()
+    var imageForm = this.refs.imageForm.getDOMNode()
 
-    BooksActionCreators.addBook(data, form).then(function() {
+    BooksActionCreators.addBook(data, imageForm).then(function() {
       this.transitionTo('books')
     }.bind(this))
   },
 
   render() {
     let {headerColors, form} = this.state
-    
-    if (!headerColors)
-      return (<div></div>)
 
     return (
       <div>
@@ -66,7 +63,7 @@ export default React.createClass({
           label='Enter book name'
           ref='name'
           onChange={this.nameChange} />
-        <UploadImage ref="form" help="Chose book image" label="Book image" />
+        <UploadImage ref="imageForm" help="Chose book image" label="Book image" />
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Add book</Button>
       </div>

@@ -26,12 +26,14 @@ export default {
     })
 
     rest.addBook(data).then(function(response) {
+      rest.upload('book', response.data.id, 'image', form).then(function(response) {
         Dispatcher.handleServerAction({
           type: Constants.ActionTypes.SUCCESS_ADD_BOOK,
           book: response.data
         })
 
         def.resolve()
+      })
     })
 
     return def.promise()
@@ -46,17 +48,17 @@ export default {
 
     var defArr = []
 
-    data.bg.forEach(function(item) {
+    data.images.forEach(function(item) {
       let def = vow.defer()
       defArr.push(def.promise())
 
       if (item.delete)
-        rest.removeUpload('book', id, 'bg', item.id).then(function(response) {
+        rest.removeUpload('book', id, 'image', item.id).then(function(response) {
           def.resolve(response)
         })
     })
 
-    defArr.push(rest.upload('book', id, 'bg', form))
+    defArr.push(rest.upload('book', id, 'image', form))
     defArr.push(rest.editBook(id, data))
 
     vow.all(defArr).then(function(all) {

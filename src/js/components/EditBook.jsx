@@ -1,8 +1,7 @@
 import React from 'react';
-import CategoriesActionCreators from '../actions/CategoriesActionCreators.js';
+import BooksActionCreators from '../actions/BooksActionCreators.js';
 import HeaderColorsActionCreators from '../actions/HeaderColorsActionCreators.js';
-import CategoriesStore from '../stores/CategoriesStore';
-import HeaderColorsStore from '../stores/HeaderColorsStore';
+import BooksStore from '../stores/BooksStore.js';
 import UploadImage from './helpers/UploadImage.jsx';
 import {Button, Input, Modal} from 'react-bootstrap';
 import {Navigation} from 'react-router';
@@ -11,58 +10,39 @@ export default React.createClass({
   mixins: [Navigation],
 
   getInitialState() {
-    let categoryId = this.props.params.id
-    let category = CategoriesStore.getOne(categoryId)
+    let bookId = this.props.params.id
+    let book = BooksStore.getOne(bookId)
 
-    HeaderColorsActionCreators.loadHeaderColors()
-
-    if (!category)
-      CategoriesActionCreators.loadCategories(categoryId)
+    if (!book)
+      BooksActionCreators.loadBooks(bookId)
 
     return {
-      form: category,
-      deleteBg: [],
+      form: book,
       showDeleteModal: false
     }
   },
 
-  nameChange() {
+  valueChange(fieldName) {
     this.setState(function(prev) {
-      prev.form.name = this.refs.name.getValue()
+      prev.form[fieldName] = this.refs[fieldName].getValue()
 
       return prev
     })
   },
 
-  headerColorChange() {
-    this.setState(function(previousState) {
-      previousState.form.headerColor = this.refs.headerColor.getValue()
-      return previousState
-    })
-  },
-
   _onChange() {
     this.setState(function(prev) {
-      let obj = {
-        form: CategoriesStore.getOne(this.props.params.id),
-        headerColors: HeaderColorsStore.getAll()
-      }
-
-      if (obj.form && !!obj.form.headerColor.id)
-        obj.form.headerColor = obj.form.headerColor.id
-
-      return obj
+      prev.form = BooksStore.getOne(this.props.params.id)
+      return prev
     })
   },
 
   componentDidMount() {
-    CategoriesStore.addChangeListener(this._onChange);
-    HeaderColorsStore.addChangeListener(this._onChange);
+    BooksStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
-    CategoriesStore.removeChangeListener(this._onChange);
-    HeaderColorsStore.removeChangeListener(this._onChange);
+    BooksStore.removeChangeListener(this._onChange);
   },
 
   toggleDeleteModal() {
@@ -70,24 +50,24 @@ export default React.createClass({
   },
 
   submit() {
-    CategoriesActionCreators.editCategory(this.props.params.id, this.state.form, this.refs.form.getDOMNode()).then(function() {
-      this.transitionTo('categories')
+    BooksActionCreators.editBook(this.props.params.id, this.state.form, this.refs.form.getDOMNode()).then(function() {
+      this.transitionTo('books')
     }.bind(this))
   },
 
   delete() {
     this.toggleDeleteModal()
 
-    CategoriesActionCreators.deleteCategory(this.props.params.id).then(function() {
-      this.transitionTo('categories')
+    BooksActionCreators.deleteBook(this.props.params.id).then(function() {
+      this.transitionTo('books')
     }.bind(this))
   },
 
-  deleteBg(id) {
+  deleteFile(id, fieldName) {
     this.setState(function(prev) {
-      prev.form.bg.forEach(function(item, index) {
+      prev.form[fieldName].forEach(function(item, index) {
         if (item.id == id)
-          prev.form.bg[index].delete = true
+          prev.form[fieldName][index].delete = true
       })
 
       return prev
@@ -95,36 +75,60 @@ export default React.createClass({
   },
 
   render() {
-    let {form, headerColors} = this.state
+    let {form} = this.state
 
-    if (!form || !headerColors)
+    if (!form)
       return(<div></div>)
-
-    let headerColorsDOM = headerColors.map(item => <option value={item.id}>{item.color}</option>)
 
     return (
       <div>
-        <h2>Edit category</h2>
+        <h2>Edit book</h2>
         <Input
           type='text'
           value={form.name}
-          label='Enter category name'
-          ref='name'
-          name='name'
-          onChange={this.nameChange} />
-        <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
-          {headerColorsDOM}
-        </Input>
-        <UploadImage ref="form" onDeleteImg={this.deleteBg} image={form.bg[0]} help="Chose category image" label="Category image" />
+          label='Enter book name'
+          ref="name"
+          onChange={this.valueChange.bind(this, 'name')} />
+        <Input
+          type='number'
+          value={form.priceE}
+          label='Enter electric book price'
+          ref="priceE"
+          onChange={this.valueChange.bind(this, 'priceE')} />
+        <Input
+          type='number'
+          value={form.priceA}
+          label='Enter analog book price'
+          ref="priceA"
+          onChange={this.valueChange.bind(this, 'priceA')} />
+        <Input
+          type='number'
+          value={form.recommendRetailPrice}
+          label='Enter recomend retail price'
+          ref="recommendRetailPrice"
+          onChange={this.valueChange.bind(this, 'recommendRetailPrice')} />
+        <Input
+          type='number'
+          value={form.length}
+          label='Enter book length'
+          ref="length"
+          onChange={this.valueChange.bind(this, 'length')} />
+        <Input
+          type='number'
+          value={form.countReeditions}
+          label='Enter reeditions count'
+          ref="countReeditions"
+          onChange={this.valueChange.bind(this, 'countReeditions')} />
+        <UploadImage ref="form" onDeleteImg={this.deleteFile} fieldName="images" image={form.images[0]} help="Chose book image" label="Book image" />
         <hr/>
-        <Button bsStyle='primary' onClick={this.submit}>Edit category</Button>
-        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete category</Button>
+        <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>
+        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete book</Button>
 
 
 
         <Modal show={this.state.showDeleteModal} onHide={this.toggleDeleteModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Are you sure want to delete this category?</Modal.Title>
+            <Modal.Title>Are you sure want to delete this book?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h4>{form.name}</h4>

@@ -12,7 +12,7 @@ export default React.createClass({
   },
 
   createBooksDom(books) {
-    return books.map(books=> <Book book={book} />)
+    return books.map(book => <Book book={book} />)
   },
 
   _onChange() {

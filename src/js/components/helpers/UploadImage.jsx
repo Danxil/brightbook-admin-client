@@ -4,7 +4,7 @@ import Constants from '../../Constants';
 
 export default React.createClass({
   render() {
-    let {image, className, help, label, onDeleteImg} = this.props;
+    let {image, className, help, label, onDeleteImg, fieldName} = this.props;
     let elem
     let imgStyle = {
       maxWidth: '100%'
@@ -17,7 +17,7 @@ export default React.createClass({
         <div>
           <p className="clearfix">
             <label>{label}</label>
-            <Button className="pull-right" onClick={onDeleteImg.bind(this, image.id)}>Delete image</Button>
+            <Button className="pull-right" onClick={onDeleteImg.bind(this, image.id, fieldName)}>Delete image</Button>
           </p>
           <div>
             <img src={srcPath} className={className} style={imgStyle} alt=""/>
