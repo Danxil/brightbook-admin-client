@@ -4,7 +4,7 @@ import Constants from '../../Constants';
 
 export default React.createClass({
   render() {
-    let {image, className, help, label, onDeleteImg, fieldName} = this.props;
+    let {image, className, help, label, onDeleteImg, fieldName, multiple} = this.props;
     let elem
     let imgStyle = {
       maxWidth: '100%'
@@ -26,7 +26,18 @@ export default React.createClass({
       )
     }
     else
-      elem = (<Input accept="image/*" type="file" name="file" help={help} />)
+      if (multiple)
+        elem = (
+          <div>
+            <label>{label}</label>
+            <Input accept="image/*" type="file" multiple name="file" help={help} />
+          </div>)
+      else
+        elem = (
+          <div>
+            <label>{label}</label>
+            <Input accept="image/*" type="file" name="file" help={help} />
+          </div>)
 
     return (<form className="form-group">{elem}</form>);
   }

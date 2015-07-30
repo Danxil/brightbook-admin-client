@@ -40,10 +40,15 @@ export default assign({}, EventEmitter.prototype, {
       items = [items]
 
     for (let i = 0; i < items.length; i++) {
-      _.each(this._model, function(item, index) {
-        if (item[this._id] == items[i][this._id])
-          this._model[index] = items.splice(i, 1)[0]
-      }.bind(this))
+      for (let ii = 0; ii < this._model.length; ii++) {
+        if (this._model[ii][this._id] != items[i][this._id])
+          continue
+
+        this._model[ii] = items.splice(i, 1)[0]
+        i--
+
+        break
+      }
     }
 
     this._model = _.union(this._model, items)

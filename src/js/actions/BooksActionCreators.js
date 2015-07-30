@@ -6,16 +6,22 @@ import vow from 'vow'
 
 export default {
   loadBooks(id) {
+    var def = vow.defer()
+
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_LOAD_BOOKS
     })
 
-    return rest.getBooks(id).then(function(response) {
+    rest.getBooks(id).then(function(response) {
       Dispatcher.handleServerAction({
         type: Constants.ActionTypes.SUCCESS_LOAD_BOOKS,
         books: response.data
       });
+
+      def.resolve()
     })
+
+    return def.promise()
   },
 
   addBook(data, form) {
@@ -46,44 +52,52 @@ export default {
       type: Constants.ActionTypes.START_EDIT_BOOK
     })
 
-    var defArr = []
+    rest.editBook(id, data).then(function() {
+      var defArr = []
 
-    data.images.forEach(function(item) {
-      let def = vow.defer()
-      defArr.push(def.promise())
+      data.images.forEach(function(item) {
+        if (!item.delete)
+          return
 
-      if (item.delete)
+        var def = vow.defer()
+        defArr.push(def.promise())
+
         rest.removeUpload('book', id, 'image', item.id).then(function(response) {
           def.resolve(response)
         })
-    })
+      })
 
+      defArr.push(rest.upload('book', id, 'image', form))
 
-    defArr.push(rest.upload('book', id, 'image', form))
-    defArr.push(rest.editBook(id, data))
+      vow.all(defArr).then(function(all) {
+        Dispatcher.handleServerAction({
+          type: Constants.ActionTypes.SUCCESS_EDIT_BOOK,
+          book: all[all.length - 1].data
+        });
 
-    vow.all(defArr).then(function(all) {
-      Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_EDIT_BOOK,
-        book: all[all.length - 1].data
-      });
-
-      def.resolve()
+        def.resolve()
+      })
     })
 
     return def.promise()
   },
 
   deleteBook(id) {
+    var def = vow.defer()
+
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_DELETE_BOOK
     })
 
-    return rest.deleteBook(id).then(function() {
+    rest.deleteBook(id).then(function() {
       Dispatcher.handleServerAction({
         type: Constants.ActionTypes.SUCCESS_DELETE_BOOK,
         id: id
       });
+
+      def.resolve()
     })
+
+    return def.promise()
   },
 };

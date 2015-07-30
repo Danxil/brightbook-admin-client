@@ -45,6 +45,7 @@ export default {
 
   ConfigSources: {
     SERVER_BASE_URL: 'http://localhost:3000',
-    REST_BASE_URL: 'http://localhost:3000/api'
+    REST_BASE_URL: 'http://localhost:3000/api',
+    DATE_FORMAT: 'YYYY-MM-DD'
   }
 };
