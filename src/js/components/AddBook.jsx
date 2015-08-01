@@ -35,10 +35,15 @@ export default React.createClass({
 
   submit() {
     var data = this.state.form
-    var imageForm = this.refs.imagesForm.getDOMNode()
 
-    BooksActionCreators.addBook(data, imageForm).then(function() {
-      this.transitionTo('books')
+    var fileForms = {
+      image: this.refs.imagesForm.getDOMNode(),
+      banner: this.refs.bannersForm.getDOMNode(),
+      preview: this.refs.previewsForm.getDOMNode(),
+    }
+
+    BooksActionCreators.addBook(data, fileForms).then(function(result) {
+      this.transitionTo('edit-book-reviews', {id: result.id})
     }.bind(this))
   },
 
@@ -53,7 +58,6 @@ export default React.createClass({
 
     function dateChange(fieldName, date) {
       this.setState(function(prev) {
-        console.log(prev)
         prev.datepicker[fieldName] = date
         prev.form[fieldName] = date.format(Constants.ConfigSources.DATE_FORMAT)
         return prev
@@ -93,10 +97,15 @@ export default React.createClass({
             ref={field.name}
             help={field.help}
             fieldName={field.fieldName}
+            multiple={field.multiple}
             label={field.label} />)
           break
       }
     }.bind(this))
+  },
+
+  generateBookReviewsDOM(form) {
+
   },
 
   render() {
@@ -150,12 +159,30 @@ export default React.createClass({
         help: 'Chose book image',
         label: 'Book image',
       },
+      {
+        type: 'uploadImage',
+        name: 'bannersForm',
+        fieldName: 'banners',
+        help: 'Chose book banner',
+        label: 'Book banner',
+        images: form.banners,
+      },
+      {
+        type: 'uploadImage',
+        name: 'previewsForm',
+        fieldName: 'previews',
+        help: 'Chose book previews',
+        label: 'Book previews',
+        images: form.previews,
+        multiple: true
+      }
     ]
 
     return (
       <div>
         <h2>Add new book</h2>
         {this.generateFieldsDOM(form, datepicker, fields)}
+        {this.generateBookReviewsDOM(form)}
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Add book</Button>
       </div>

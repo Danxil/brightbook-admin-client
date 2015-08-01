@@ -3,6 +3,7 @@ import Constants from '../Constants';
 import rest from '../api/rest.js';
 import BooksStore from '../stores/BooksStore.js';
 import vow from 'vow'
+import _ from 'underscore'
 
 export default {
   loadBooks(id) {
@@ -24,7 +25,7 @@ export default {
     return def.promise()
   },
 
-  addBook(data, form) {
+  addBook(data, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
@@ -32,20 +33,26 @@ export default {
     })
 
     rest.addBook(data).then(function(response) {
-      rest.upload('book', response.data.id, 'image', form).then(function(response) {
+      var defArr = []
+
+      _.mapObject(forms, function(value, key) {
+        defArr.push(rest.upload('book', response.data.id, key, forms[key]))
+      })
+
+      vow.all(defArr).then(function(all) {
         Dispatcher.handleServerAction({
           type: Constants.ActionTypes.SUCCESS_ADD_BOOK,
-          book: response.data
+          book: all[all.length - 1].data
         })
 
-        def.resolve()
+        def.resolve(all[all.length - 1].data)
       })
     })
 
     return def.promise()
   },
 
-  editBook(id, data, form) {
+  editBook(id, data, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
@@ -55,19 +62,16 @@ export default {
     rest.editBook(id, data).then(function() {
       var defArr = []
 
-      data.images.forEach(function(item) {
-        if (!item.delete)
-          return
+      _.mapObject(forms, function(value, key) {
+        defArr.push(rest.upload('book', id, key, forms[key]))
 
-        var def = vow.defer()
-        defArr.push(def.promise())
+        data[key + 's'].forEach(function(item) {
+          if (!item.delete)
+            return
 
-        rest.removeUpload('book', id, 'image', item.id).then(function(response) {
-          def.resolve(response)
+          defArr.push(rest.removeUpload('book', id, key, item.id))
         })
       })
-
-      defArr.push(rest.upload('book', id, 'image', form))
 
       vow.all(defArr).then(function(all) {
         Dispatcher.handleServerAction({

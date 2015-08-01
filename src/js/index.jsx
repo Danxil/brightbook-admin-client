@@ -6,6 +6,7 @@ import EditCategory from './components/EditCategory.jsx';
 import BooksContainer from './components/BooksContainer.jsx';
 import AddBook from './components/AddBook.jsx';
 import EditBook from './components/EditBook.jsx';
+import BookReviews from './components/BookReviews.jsx';
 import {run, HashLocation, Route, Link } from 'react-router';
 
 let routes = (
@@ -16,6 +17,7 @@ let routes = (
         <Route name="books" path="/books" handler={BooksContainer} />
         <Route name="add-book" path="/add-book" handler={AddBook} />
         <Route name="edit-book" path="/books/:id" handler={EditBook} />
+        <Route name="edit-book-reviews" path="/books/:id/reviews" handler={BookReviews} />
     </Route>
 )
 

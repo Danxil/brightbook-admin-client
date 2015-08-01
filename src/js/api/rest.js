@@ -86,7 +86,51 @@ export default (function(vow){
   
       return jq.get(url)
     },
-    
+
+    getBookReviews(id) {
+      let def = vow.defer()
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/review'
+
+      jq.ajax({
+        url: url,
+        type: 'get',
+        success: function(result) {
+          def.resolve(result)
+        }
+      })
+
+      return def.promise()
+    },
+
+    editBookReview(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookreview/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+
+    addBookReview(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookreview'
+
+      return jq.ajax({
+        url: url,
+        type: 'post',
+        data: data
+      })
+    },
+
+    associateBookAndBookReview(id, childId) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/reviews/' + childId
+
+      return jq.ajax({
+        url: url,
+        type: 'post'
+      })
+    },
+
     upload(model, id, property, data) {
       let def = vow.defer()
 
@@ -118,7 +162,7 @@ export default (function(vow){
           url: url,
           type: 'delete',
           success: function (result) {
-            def.resolve(result)
+            def.resolve({data: result})
           }
         });
 

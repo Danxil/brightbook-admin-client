@@ -57,7 +57,13 @@ export default React.createClass({
   },
 
   submit() {
-    BooksActionCreators.editBook(this.props.params.id, this.state.form, this.refs.imagesForm.getDOMNode()).then(function() {
+    var fileForms = {
+      image: this.refs.imagesForm.getDOMNode(),
+      banner: this.refs.bannersForm.getDOMNode(),
+      preview: this.refs.previewsForm.getDOMNode(),
+    }
+
+    BooksActionCreators.editBook(this.props.params.id, this.state.form, fileForms).then(function() {
       this.transitionTo('books')
     }.bind(this))
   },
@@ -68,22 +74,6 @@ export default React.createClass({
     BooksActionCreators.deleteBook(this.props.params.id).then(function() {
       this.transitionTo('books')
     }.bind(this))
-  },
-
-  valueChange(fieldName) {
-    this.setState(function(prev) {
-      prev.form[fieldName] = this.refs[fieldName].getValue()
-
-      return prev
-    })
-  },
-
-  dateChange(fieldName, date) {
-    this.setState(function(prev) {
-      prev.datepicker[fieldName] = date
-      prev.form[fieldName] = date.format(Constants.ConfigSources.DATE_FORMAT)
-      return prev
-    })
   },
 
   generateFieldsDOM(form, datepicker, fields) {
@@ -105,9 +95,8 @@ export default React.createClass({
 
     function deleteFile(id, fieldName) {
       this.setState(function(prev) {
-        console.log(prev)
         prev.form[fieldName].forEach(function(item, index) {
-          if (item.id == id)
+          if (item && item.id == id)
             prev.form[fieldName][index].delete = true
         })
 
@@ -146,10 +135,11 @@ export default React.createClass({
         case 'uploadImage':
           return (<UploadImage
             ref={field.name}
-            image={field.image}
+            images={field.images}
             help={field.help}
             onDeleteImg={deleteFile.bind(this)}
             fieldName={field.fieldName}
+            multiple={field.multiple}
             label={field.label} />)
           break
       }
@@ -209,7 +199,24 @@ export default React.createClass({
         fieldName: 'images',
         help: 'Chose book image',
         label: 'Book image',
-        image: form.images[0]
+        images: form.images,
+      },
+      {
+        type: 'uploadImage',
+        name: 'bannersForm',
+        fieldName: 'banners',
+        help: 'Chose book banner',
+        label: 'Book banner',
+        images: form.banners,
+      },
+      {
+        type: 'uploadImage',
+        name: 'previewsForm',
+        fieldName: 'previews',
+        help: 'Chose book previews',
+        label: 'Book previews',
+        images: form.previews,
+        multiple: true
       },
     ]
 

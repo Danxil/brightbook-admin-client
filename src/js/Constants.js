@@ -35,7 +35,21 @@ export default {
     
     
     START_LOAD_HEADER_COLORS: null,
-    SUCCESS_LOAD_HEADER_COLORS: null
+    SUCCESS_LOAD_HEADER_COLORS: null,
+
+
+
+    START_LOAD_BOOK_REVIEWS: null,
+    SUCCESS_LOAD_BOOK_REVIEWS: null,
+
+    START_ADD_BOOK_REVIEW: null,
+    SUCCESS_ADD_BOOK_REVIEW: null,
+
+    START_EDIT_BOOK_REVIEW: null,
+    SUCCESS_EDIT_BOOK_REVIEW: null,
+
+    START_DELETE_BOOK_REVIEW: null,
+    SUCCESS_DELETE_BOOK_REVIEW: null,
   }),
 
   ActionSources: keyMirror({
@@ -46,6 +60,7 @@ export default {
   ConfigSources: {
     SERVER_BASE_URL: 'http://localhost:3000',
     REST_BASE_URL: 'http://localhost:3000/api',
-    DATE_FORMAT: 'YYYY-MM-DD'
+    DATE_FORMAT: 'YYYY-MM-DD',
+    BOOK_REVIEWS_COUNT: 4,
   }
 };

@@ -1,44 +1,63 @@
 import React from 'react';
 import {Input, Button} from 'react-bootstrap';
 import Constants from '../../Constants';
+import _ from 'underscore';
 
 export default React.createClass({
   render() {
-    let {image, className, help, label, onDeleteImg, fieldName, multiple} = this.props;
-    let elem
-    let imgStyle = {
+    var {images, className, help, label, onDeleteImg, fieldName, multiple} = this.props;
+    var imgStyle = {
       maxWidth: '100%'
     }
 
-    if (image && !image.delete) {
+    images = _.clone(images)
+
+    if (!images)
+      images = []
+
+    if (!_.isArray(images))
+      images = [images]
+
+    var elems = []
+
+    for (var i = 0; i < images.length; i++) {
+      var image = images[i]
+
+      if (image.delete) {
+        images.splice(i, 1)
+        i--
+        continue
+      }
+
       let srcPath = Constants.ConfigSources.SERVER_BASE_URL + image.link
 
-      elem = (
+      elems.push(<div className="form-group">
+        <p className="clearfix">
+          <Button className="pull-right" onClick={onDeleteImg.bind(this, image.id, fieldName)}>Delete image</Button>
+        </p>
         <div>
-          <p className="clearfix">
-            <label>{label}</label>
-            <Button className="pull-right" onClick={onDeleteImg.bind(this, image.id, fieldName)}>Delete image</Button>
-          </p>
-          <div>
-            <img src={srcPath} className={className} style={imgStyle} alt=""/>
-          </div>
+          <img src={srcPath} className={className} style={imgStyle} alt=""/>
         </div>
-      )
+      </div>)
     }
-    else
-      if (multiple)
-        elem = (
-          <div>
-            <label>{label}</label>
-            <Input accept="image/*" type="file" multiple name="file" help={help} />
-          </div>)
-      else
-        elem = (
-          <div>
-            <label>{label}</label>
-            <Input accept="image/*" type="file" name="file" help={help} />
-          </div>)
 
-    return (<form className="form-group">{elem}</form>);
+    if (images.length > 0 && !multiple)
+      var input = ('')
+    else if (multiple)
+      var input = (
+        <div style={{clear: 'both'}}>
+          <Input accept="image/*" type="file" multiple name="file" help={help} />
+        </div>)
+    else
+      var input = (
+        <div style={{clear: 'both'}}>
+          <Input accept="image/*" type="file" name="file" help={help} />
+        </div>)
+
+    return (<form>
+      <label className="pull-left">{label}</label>
+      {elems}
+      {input}
+    </form>);
   }
 });
