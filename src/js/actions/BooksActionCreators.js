@@ -25,7 +25,7 @@ export default {
     return def.promise()
   },
 
-  addBook(data, forms) {
+  addBook(data, selects, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
@@ -34,6 +34,13 @@ export default {
 
     rest.addBook(data).then(function(response) {
       var defArr = []
+
+      _.mapObject(selects, function(value, key) {
+        value.forEach(function(item) {
+          defArr.push(rest.associateBook(response.data.id, key, item))
+        })
+      })
+
 
       _.mapObject(forms, function(value, key) {
         defArr.push(rest.upload('book', response.data.id, key, forms[key]))
@@ -52,7 +59,7 @@ export default {
     return def.promise()
   },
 
-  editBook(id, data, forms) {
+  editBook(id, data, selects, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
@@ -61,6 +68,18 @@ export default {
 
     rest.editBook(id, data).then(function() {
       var defArr = []
+
+      _.mapObject(selects, function(value, key) {
+        value.forEach(function(item) {
+          defArr.push(rest.associateBook(id, key, item))
+        })
+
+        data[key].forEach(function(item) {
+          if (value.indexOf(item.id.toString()) == -1) {
+            defArr.push(rest.unassociateBook(id, key, item.id))
+          }
+        })
+      })
 
       _.mapObject(forms, function(value, key) {
         defArr.push(rest.upload('book', id, key, forms[key]))
@@ -73,7 +92,7 @@ export default {
         })
       })
 
-      vow.all(defArr).then(function(all) {
+      vow.all(defArr).then(function(all) {console.log(all)
         Dispatcher.handleServerAction({
           type: Constants.ActionTypes.SUCCESS_EDIT_BOOK,
           book: all[all.length - 1].data

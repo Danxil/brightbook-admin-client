@@ -1,5 +1,5 @@
 import React from 'react';
-import Book from './Books.jsx';
+import Book from './Book.jsx';
 import ListGroup from '../../../../node_modules/react-bootstrap/lib/ListGroup';
 import BooksActionCreators from '../../actions/BooksActionCreators.js';
 import BooksStore from '../../stores/BooksStore.js';

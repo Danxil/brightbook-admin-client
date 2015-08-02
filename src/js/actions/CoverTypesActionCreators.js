@@ -3,6 +3,7 @@ import Constants from '../Constants';
 import rest from '../api/rest.js';
 import CoverTypesStore from '../stores/CoverTypesStore.js';
 import vow from 'vow'
+import _ from 'underscore'
 
 export default {
   loadCoverTypes(id) {
@@ -44,10 +45,13 @@ export default {
       type: Constants.ActionTypes.START_EDIT_COVER_TYPE
     })
 
-    rest.editCoverType(id, data).then(function() {
+    data = _.clone(data)
+    delete data.books
+
+    rest.editCoverType(id, data).then(function(result) {
       Dispatcher.handleServerAction({
         type: Constants.ActionTypes.SUCCESS_EDIT_COVER_TYPE,
-        coverType: all[all.length - 1].data
+        coverType: result.data
       });
 
       def.resolve()

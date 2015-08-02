@@ -1,13 +1,15 @@
 import React from 'react';
 import BooksActionCreators from '../../actions/BooksActionCreators.js';
-import HeaderColorsActionCreators from '../../actions/HeaderColorsActionCreators.js';
 import BooksStore from '../../stores/BooksStore.js';
+import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
+import CategoriesStore from '../../stores/CategoriesStore';
 import UploadImage from './../helpers/UploadImage.jsx';
 import Constants from '../../Constants.js';
 import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
 import Datepicker from './../helpers/Datepicker.jsx';
 import Moment from 'moment';
+import _ from 'underscore';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -16,18 +18,14 @@ export default React.createClass({
     var obj = {}
 
     let bookId = this.props.params.id
-    let book = BooksStore.getOne(bookId)
 
-    if (!book)
-      BooksActionCreators.loadBooks(bookId)
+    BooksActionCreators.loadBooks(bookId)
+    CategoriesActionCreators.loadCategories()
 
-    obj.form = book
     obj.datepicker = {}
+    obj.selects = {}
     obj.showDeleteModal = false
 
-    if (book) {
-      obj.datepicker.dateFirstEdition = book.dateFirstEdition ? Moment(book.dateFirstEdition) : null
-    }
     return obj
   },
 
@@ -39,17 +37,23 @@ export default React.createClass({
 
       if (book) {
         prev.datepicker.dateFirstEdition = book.dateFirstEdition ? Moment(book.dateFirstEdition) : null
+        prev.selects.categories = _.map(book.categories, (item=> item.id))
       }
+
+      prev.categories = CategoriesStore.getAll()
+
       return prev
     })
   },
 
   componentDidMount() {
     BooksStore.addChangeListener(this._onChange);
+    CategoriesStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
     BooksStore.removeChangeListener(this._onChange);
+    CategoriesStore.removeChangeListener(this._onChange);
   },
 
   toggleDeleteModal() {
@@ -63,7 +67,11 @@ export default React.createClass({
       preview: this.refs.previewsForm.getDOMNode(),
     }
 
-    BooksActionCreators.editBook(this.props.params.id, this.state.form, fileForms).then(function() {
+    var selects = {
+      categories: this.refs.categories.getValue(),
+    }
+
+    BooksActionCreators.editBook(this.props.params.id, this.state.form, selects, fileForms).then(function() {
       this.transitionTo('books')
     }.bind(this))
   },
@@ -76,10 +84,18 @@ export default React.createClass({
     }.bind(this))
   },
 
-  generateFieldsDOM(form, datepicker, fields) {
+  generateFieldsDOM(form, datepicker, selects, fields) {
     function valueChange(fieldName) {
       this.setState(function(prev) {
         prev.form[fieldName] = this.refs[fieldName].getValue()
+
+        return prev
+      })
+    }
+
+    function selectChange(fieldName) {
+      this.setState(function(prev) {
+        prev.selects[fieldName] = this.refs[fieldName].getValue()
 
         return prev
       })
@@ -115,6 +131,28 @@ export default React.createClass({
             onChange={valueChange.bind(this, field.name)}/>)
           break
 
+        case 'select':
+          if (!field.multiple)
+            return (<Input
+              type={field.type}
+              value={selects[field.name]}
+              label={field.label}
+              ref={field.name}
+              onChange={selectChange.bind(this, field.name)}>
+                {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
+              </Input>)
+          else
+            return (<Input
+              type={field.type}
+              value={selects[field.name]}
+              label={field.label}
+              ref={field.name}
+              multiple
+              onChange={selectChange.bind(this, field.name)}>
+                {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
+              </Input>)
+          break
+
         case 'number':
           return (<Input
             type={field.type}
@@ -147,9 +185,9 @@ export default React.createClass({
   },
 
   render() {
-    let {form, datepicker} = this.state
+    let {form, categories, selects, datepicker} = this.state
 
-    if (!form)
+    if (!form || !categories)
       return(<div></div>)
 
     var fields = [
@@ -157,6 +195,14 @@ export default React.createClass({
         type: 'text',
         label: 'Enter book name',
         name: 'name',
+      },
+      {
+        type: 'select',
+        label: 'Choose category',
+        name: 'categories',
+        options: categories,
+        optionLabelField: 'name',
+        multiple: true
       },
       {
         type: 'number',
@@ -235,7 +281,7 @@ export default React.createClass({
             </ButtonToolbar>
           </h2>
         </div>
-        {this.generateFieldsDOM(form, datepicker, fields)}
+        {this.generateFieldsDOM(form, datepicker, selects, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
           <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>

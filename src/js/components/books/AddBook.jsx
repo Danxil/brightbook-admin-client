@@ -1,6 +1,8 @@
 import React from 'react';
 import BooksActionCreators from '../../actions/BooksActionCreators.js';
 import BooksStore from '../../stores/BooksStore.js';
+import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
+import CategoriesStore from '../../stores/CategoriesStore';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
 import UploadImage from './../helpers/UploadImage.jsx';
@@ -10,17 +12,30 @@ import Constants from '../../Constants.js';
 export default React.createClass({
   mixins: [Navigation],
 
+  componentDidMount() {
+    CategoriesStore.addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount() {
+    CategoriesStore.removeChangeListener(this._onChange);
+  },
+
   getInitialState() {
+    CategoriesActionCreators.loadCategories()
+
     return {
-      form: {
-        name: '',
-      },
-      datepicker: {}
+      form: {},
+      datepicker: {},
+      selects: {
+        categories: []
+      }
     }
   },
 
   _onChange() {
     this.setState(function(prev) {
+      prev.categories = CategoriesStore.getAll()
+
       return prev
     })
   },
@@ -34,15 +49,27 @@ export default React.createClass({
       preview: this.refs.previewsForm.getDOMNode(),
     }
 
-    BooksActionCreators.addBook(data, fileForms).then(function(result) {
+    var selects = {
+      categories: this.refs.categories.getValue(),
+    }
+
+    BooksActionCreators.addBook(data, selects, fileForms).then(function(result) {
       this.transitionTo('edit-book-reviews', {id: result.id}, {addingBook: true})
     }.bind(this))
   },
 
-  generateFieldsDOM(form, datepicker, fields) {
+  generateFieldsDOM(form, datepicker, selects, fields) {
     function valueChange(fieldName) {
       this.setState(function(prev) {
         prev.form[fieldName] = this.refs[fieldName].getValue()
+
+        return prev
+      })
+    }
+
+    function selectChange(fieldName) {
+      this.setState(function(prev) {
+        prev.selects[fieldName] = this.refs[fieldName].getValue()
 
         return prev
       })
@@ -65,6 +92,28 @@ export default React.createClass({
             label={field.label}
             ref={field.name}
             onChange={valueChange.bind(this, field.name)}/>)
+          break
+
+        case 'select':
+          if (!field.multiple)
+            return (<Input
+              type={field.type}
+              value={selects[field.name]}
+              label={field.label}
+              ref={field.name}
+              onChange={selectChange.bind(this, field.name)}>
+              {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
+            </Input>)
+          else
+            return (<Input
+              type={field.type}
+              value={selects[field.name]}
+              label={field.label}
+              ref={field.name}
+              multiple
+              onChange={selectChange.bind(this, field.name)}>
+              {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
+            </Input>)
           break
 
         case 'number':
@@ -97,13 +146,21 @@ export default React.createClass({
   },
 
   render() {
-    var {form, datepicker} = this.state
+    var {form, categories, selects, datepicker} = this.state
 
     var fields = [
       {
         type: 'text',
         label: 'Enter book name',
         name: 'name',
+      },
+      {
+        type: 'select',
+        label: 'Choose category',
+        name: 'categories',
+        options: categories,
+        optionLabelField: 'name',
+        multiple: true
       },
       {
         type: 'number',
@@ -166,10 +223,13 @@ export default React.createClass({
       }
     ]
 
+    if (!categories)
+      return(<div></div>)
+
     return (
       <div>
         <h2>Add new book</h2>
-        {this.generateFieldsDOM(form, datepicker, fields)}
+        {this.generateFieldsDOM(form, datepicker, selects, fields)}
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Add book</Button>
       </div>

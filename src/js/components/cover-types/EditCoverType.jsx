@@ -20,9 +20,6 @@ export default React.createClass({
     obj.form = coverType
     obj.showDeleteModal = false
 
-    if (coverType) {
-      obj.datepicker.dateFirstEdition = coverType.dateFirstEdition ? Moment(coverType.dateFirstEdition) : null
-    }
     return obj
   },
 
@@ -32,9 +29,6 @@ export default React.createClass({
 
       prev.form = coverType
 
-      if (coverType) {
-        prev.datepicker.dateFirstEdition = coverType.dateFirstEdition ? Moment(coverType.dateFirstEdition) : null
-      }
       return prev
     })
   },
@@ -52,14 +46,8 @@ export default React.createClass({
   },
 
   submit() {
-    var fileForms = {
-      image: this.refs.imagesForm.getDOMNode(),
-      banner: this.refs.bannersForm.getDOMNode(),
-      preview: this.refs.previewsForm.getDOMNode(),
-    }
-
-    CoverTypesActionCreators.editCoverType(this.props.params.id, this.state.form, fileForms).then(function() {
-      this.transitionTo('coverTypes')
+    CoverTypesActionCreators.editCoverType(this.props.params.id, this.state.form).then(function() {
+      this.transitionTo('cover-types')
     }.bind(this))
   },
 
@@ -67,11 +55,11 @@ export default React.createClass({
     this.toggleDeleteModal()
 
     CoverTypesActionCreators.deleteCoverType(this.props.params.id).then(function() {
-      this.transitionTo('coverTypes')
+      this.transitionTo('cover-types')
     }.bind(this))
   },
 
-  generateFieldsDOM(form, datepicker, fields) {
+  generateFieldsDOM(form, fields) {
     function valueChange(fieldName) {
       this.setState(function(prev) {
         prev.form[fieldName] = this.refs[fieldName].getValue()
@@ -119,9 +107,9 @@ export default React.createClass({
         {this.generateFieldsDOM(form, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
-          <Button bsStyle='primary' onClick={this.submit}>Edit coverType</Button>
+          <Button bsStyle='primary' onClick={this.submit}>Edit cover type</Button>
         </ButtonToolbar>
-        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete coverType</Button>
+        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete cover type</Button>
 
 
 

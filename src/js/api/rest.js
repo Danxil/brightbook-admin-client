@@ -118,6 +118,22 @@ export default (function(vow){
         type: 'delete'
       })
     },
+
+    associateBook(id, associate, childId) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/' + associate + '/' + childId
+      return jq.ajax({
+        url: url,
+        type: 'post'
+      })
+    },
+
+    unassociateBook(id, associate, childId) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/' + associate + '/' + childId
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
     
     
 

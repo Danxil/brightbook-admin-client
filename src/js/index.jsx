@@ -9,6 +9,8 @@ import EditBook from './components/books/EditBook.jsx';
 import BookReviews from './components/books/BookReviews.jsx';
 import BookReasons from './components/books/BookReasons.jsx';
 import CoverTypesContainer from './components/cover-types/CoverTypesContainer.jsx';
+import EditCoverType from './components/cover-types/EditCoverType.jsx';
+import AddCoverType from './components/cover-types/AddCoverType.jsx';
 import {run, HashLocation, Route, Link } from 'react-router';
 
 let routes = (
@@ -22,8 +24,8 @@ let routes = (
         <Route name="edit-book-reviews" path="/books/:id/reviews" handler={BookReviews} />
         <Route name="edit-book-reasons" path="/books/:id/reasons" handler={BookReasons} />
         <Route name="cover-types" path="/cover-types" handler={CoverTypesContainer} />
-        <Route name="edit-cover-type" path="/edit-cover-type" handler={CoverTypesContainer} />
-        <Route name="add-cover-type" path="/add-cover-type" handler={CoverTypesContainer} />
+        <Route name="edit-cover-type" path="/edit-cover-type/:id" handler={EditCoverType} />
+        <Route name="add-cover-type" path="/add-cover-type" handler={AddCoverType} />
     </Route>
 )
 
