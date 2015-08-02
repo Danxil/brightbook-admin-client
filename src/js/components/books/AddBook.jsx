@@ -1,78 +1,41 @@
 import React from 'react';
-import BooksActionCreators from '../actions/BooksActionCreators.js';
-import HeaderColorsActionCreators from '../actions/HeaderColorsActionCreators.js';
-import BooksStore from '../stores/BooksStore.js';
-import UploadImage from './helpers/UploadImage.jsx';
-import Constants from '../Constants.js';
-import {Button, Input, Modal} from 'react-bootstrap';
+import BooksActionCreators from '../../actions/BooksActionCreators.js';
+import BooksStore from '../../stores/BooksStore.js';
+import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
-import Datepicker from './helpers/Datepicker.jsx';
-import Moment from 'moment';
+import UploadImage from './../helpers/UploadImage.jsx';
+import Datepicker from './../helpers/Datepicker.jsx';
+import Constants from '../../Constants.js';
 
 export default React.createClass({
   mixins: [Navigation],
 
   getInitialState() {
-    var obj = {}
-
-    let bookId = this.props.params.id
-    let book = BooksStore.getOne(bookId)
-
-    if (!book)
-      BooksActionCreators.loadBooks(bookId)
-
-    obj.form = book
-    obj.datepicker = {}
-    obj.showDeleteModal = false
-
-    if (book) {
-      obj.datepicker.dateFirstEdition = book.dateFirstEdition ? Moment(book.dateFirstEdition) : null
+    return {
+      form: {
+        name: '',
+      },
+      datepicker: {}
     }
-    return obj
   },
 
   _onChange() {
     this.setState(function(prev) {
-      var book = BooksStore.getOne(this.props.params.id)
-
-      prev.form = book
-
-      if (book) {
-        prev.datepicker.dateFirstEdition = book.dateFirstEdition ? Moment(book.dateFirstEdition) : null
-      }
       return prev
     })
   },
 
-  componentDidMount() {
-    BooksStore.addChangeListener(this._onChange);
-  },
-
-  componentWillUnmount() {
-    BooksStore.removeChangeListener(this._onChange);
-  },
-
-  toggleDeleteModal() {
-    this.setState({showDeleteModal: !this.state.showDeleteModal})
-  },
-
   submit() {
+    var data = this.state.form
+
     var fileForms = {
       image: this.refs.imagesForm.getDOMNode(),
       banner: this.refs.bannersForm.getDOMNode(),
       preview: this.refs.previewsForm.getDOMNode(),
     }
 
-    BooksActionCreators.editBook(this.props.params.id, this.state.form, fileForms).then(function() {
-      this.transitionTo('books')
-    }.bind(this))
-  },
-
-  delete() {
-    this.toggleDeleteModal()
-
-    BooksActionCreators.deleteBook(this.props.params.id).then(function() {
-      this.transitionTo('books')
+    BooksActionCreators.addBook(data, fileForms).then(function(result) {
+      this.transitionTo('edit-book-reviews', {id: result.id}, {addingBook: true})
     }.bind(this))
   },
 
@@ -89,17 +52,6 @@ export default React.createClass({
       this.setState(function(prev) {
         prev.datepicker[fieldName] = date
         prev.form[fieldName] = date.format(Constants.ConfigSources.DATE_FORMAT)
-        return prev
-      })
-    }
-
-    function deleteFile(id, fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName].forEach(function(item, index) {
-          if (item && item.id == id)
-            prev.form[fieldName][index].delete = true
-        })
-
         return prev
       })
     }
@@ -135,9 +87,7 @@ export default React.createClass({
         case 'uploadImage':
           return (<UploadImage
             ref={field.name}
-            images={field.images}
             help={field.help}
-            onDeleteImg={deleteFile.bind(this)}
             fieldName={field.fieldName}
             multiple={field.multiple}
             label={field.label} />)
@@ -147,10 +97,7 @@ export default React.createClass({
   },
 
   render() {
-    let {form, datepicker} = this.state
-
-    if (!form)
-      return(<div></div>)
+    var {form, datepicker} = this.state
 
     var fields = [
       {
@@ -199,7 +146,6 @@ export default React.createClass({
         fieldName: 'images',
         help: 'Chose book image',
         label: 'Book image',
-        images: form.images,
       },
       {
         type: 'uploadImage',
@@ -217,31 +163,15 @@ export default React.createClass({
         label: 'Book previews',
         images: form.previews,
         multiple: true
-      },
+      }
     ]
 
     return (
       <div>
-        <h2>Edit book</h2>
+        <h2>Add new book</h2>
         {this.generateFieldsDOM(form, datepicker, fields)}
         <hr/>
-        <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>
-        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete book</Button>
-
-
-
-        <Modal show={this.state.showDeleteModal} onHide={this.toggleDeleteModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Are you sure want to delete this book?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h4>{form.name}</h4>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button bsStyle="danger" onClick={this.delete}>Delete</Button>
-            <Button bsStyle="primary" onClick={this.toggleDeleteModal}>Cancel</Button>
-          </Modal.Footer>
-        </Modal>
+        <Button bsStyle='primary' onClick={this.submit}>Add book</Button>
       </div>
     );
   }

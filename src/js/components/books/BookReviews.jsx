@@ -1,11 +1,12 @@
 import React from 'react';
-import BookReviewsActionCreators from '../actions/BookReviewsActionCreators.js';
-import BookReviewsStore from '../stores/BookReviewsStore.js';
-import BookReview from '../components/BookReview.jsx';
-import Constants from '../Constants.js';
+import BookReviewsActionCreators from '../../actions/BookReviewsActionCreators.js';
+import BookReviewsStore from '../../stores/BookReviewsStore.js';
+import BookReview from './BookReview.jsx';
+import Constants from '../../Constants.js';
 import {Button, Input, Modal} from 'react-bootstrap';
 import {ListGroup} from 'react-bootstrap';
 import {Navigation} from 'react-router';
+import _ from 'underscore';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -15,12 +16,12 @@ export default React.createClass({
 
     BookReviewsActionCreators.loadBookReviews(bookId)
 
-    return {reviews: BookReviewsStore.getAll()}
+    return {}
   },
 
   _onChange() {
     this.setState(function(prev) {
-      prev.reviews = BookReviewsStore.getAll()
+      prev.reviews = _.clone(BookReviewsStore.getAll())
 
       return prev
     })
@@ -29,9 +30,11 @@ export default React.createClass({
   submit() {
     var forms = []
 
-    this.state.reviews.forEach(function(item) {
+    this.state.reviews.forEach(function(item, index) {
+      var ref = item.id ? 'review-' + item.id : 'elem-' + index
+
       var fileForms = {
-        avatar: this.refs['review-' + item.id].refs.avatarForm.getDOMNode(),
+        avatar: this.refs[ref].refs.avatarForm.getDOMNode(),
       }
 
       forms.push({
@@ -41,7 +44,10 @@ export default React.createClass({
     }.bind(this))
 
     BookReviewsActionCreators.editBookReviews(this.props.params.id, forms).then(function() {
-      this.transitionTo('books')
+      if (!this.props.query.addingBook)
+        this.transitionTo('books')
+      else
+        this.transitionTo('edit-book-reasons', {id: this.props.params.id})
     }.bind(this))
   },
 
@@ -50,7 +56,10 @@ export default React.createClass({
       reviews.push({})
     }
 
-    return reviews.map(review=> <BookReview ref={'review-' + review.id} review={review} />)
+    return reviews.map(function(review, index) {
+      var ref = review.id ? 'review-' + review.id : 'elem-' + index
+      return <BookReview ref={ref} review={review} />
+    })
   },
 
   componentDidMount() {
@@ -66,14 +75,15 @@ export default React.createClass({
 
     if (!reviews)
       return <div></div>
-    else
+    else {
       return (
         <div>
           <ListGroup>
             {this.createBookReviewsDom(reviews)}
           </ListGroup>
-          <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>
+          <Button bsStyle='primary' onClick={this.submit}>Edit comments</Button>
         </div>
       )
+    }
   }
 });

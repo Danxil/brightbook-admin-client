@@ -1,14 +1,14 @@
 import React from 'react';
-import 'react/addons';
+import '../../../../node_modules/react/addons';
 import {ListGroup, ListGroupItem, Input} from 'react-bootstrap';
 import {Link} from 'react-router';
-import UploadImage from './helpers/UploadImage.jsx';
+import UploadImage from '../helpers/UploadImage.jsx';
 
 export default React.createClass({
   getInitialState() {
     var obj = {}
 
-    obj.review = this.props.review
+    obj.reason = this.props.reason
 
     return obj
   },
@@ -16,7 +16,7 @@ export default React.createClass({
   generateFieldsDOM(form, fields) {
     function valueChange(fieldName) {
       this.setState(function(prev) {
-        prev.review[fieldName] = this.refs[fieldName].getValue()
+        prev.reason[fieldName] = this.refs[fieldName].getValue()
 
         return prev
       })
@@ -24,9 +24,9 @@ export default React.createClass({
 
     function deleteFile(id, fieldName) {
       this.setState(function(prev) {
-        prev.review[fieldName].forEach(function(item, index) {
+        prev.reason[fieldName].forEach(function(item, index) {
           if (item && item.id == id)
-            prev.review[fieldName][index].delete = true
+            prev.reason[fieldName][index].delete = true
         })
 
         return prev
@@ -68,7 +68,7 @@ export default React.createClass({
   },
 
   render() {
-    let {review} = this.state;
+    let {reason} = this.state;
 
     var fields = [
       {
@@ -78,7 +78,7 @@ export default React.createClass({
       },
       {
         type: 'textarea',
-        label: 'Enter review',
+        label: 'Enter reason',
         name: 'text',
       },
       {
@@ -87,13 +87,13 @@ export default React.createClass({
         fieldName: 'avatars',
         help: 'Chose author avatar',
         label: 'Author avatar',
-        images: review.avatars,
+        images: reason.avatars,
       }
     ]
 
     return (
       <div>
-        {this.generateFieldsDOM(review, fields)}
+        {this.generateFieldsDOM(reason, fields)}
         <hr/>
       </div>)
   }

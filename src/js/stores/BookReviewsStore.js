@@ -3,7 +3,7 @@ import Constants from '../Constants';
 import BaseStore from './BaseStore';
 import assign from 'object-assign';
 
-const BookReviwsStore = assign({}, BaseStore, {
+const BookReviewsStore = assign({}, BaseStore, {
   _id: 'id',
 
   dispatcherIndex: Dispatcher.register(function(payload) {
@@ -11,47 +11,47 @@ const BookReviwsStore = assign({}, BaseStore, {
 
     switch(action.type) {
       case Constants.ActionTypes.START_LOAD_BOOK_REVIEWS:
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_LOAD_BOOK_REVIEWS:
-        BookReviwsStore.addItems(action.bookReviews)
+        BookReviewsStore.addItems(action.bookReviews)
 
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.START_ADD_BOOK_REVIEW:
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_ADD_BOOK_REVIEW:
-        BookReviwsStore.addItems(action.bookReview)
+        BookReviewsStore.addItems(action.bookReview)
 
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.START_EDIT_BOOK_REVIEW:
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_EDIT_BOOK_REVIEW:
-        BookReviwsStore.editItem(action.bookReview)
+        BookReviewsStore.editItem(action.bookReview)
 
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.START_DELETE_BOOK_REVIEW:
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
       case Constants.ActionTypes.SUCCESS_DELETE_BOOK_REVIEW:
-        BookReviwsStore.deleteItem(action.id)
+        BookReviewsStore.deleteItem(action.id)
 
-        BookReviwsStore.emitChange()
+        BookReviewsStore.emitChange()
 
         break;
     }
   })
 });
 
-export default BookReviwsStore;
+export default BookReviewsStore;

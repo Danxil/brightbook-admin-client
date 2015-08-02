@@ -50,6 +50,35 @@ export default {
 
     START_DELETE_BOOK_REVIEW: null,
     SUCCESS_DELETE_BOOK_REVIEW: null,
+
+
+
+    START_LOAD_BOOK_REASONS: null,
+    SUCCESS_LOAD_BOOK_REASONS: null,
+
+    START_ADD_BOOK_REASON: null,
+    SUCCESS_ADD_BOOK_REASON: null,
+
+    START_EDIT_BOOK_REASON: null,
+    SUCCESS_EDIT_BOOK_REASON: null,
+
+    START_DELETE_BOOK_REASON: null,
+    SUCCESS_DELETE_BOOK_REASON: null,
+
+
+
+
+    START_LOAD_COVER_TYPES: null,
+    SUCCESS_LOAD_COVER_TYPES: null,
+
+    START_ADD_COVER_TYPE: null,
+    SUCCESS_ADD_COVER_TYPE: null,
+
+    START_EDIT_COVER_TYPE: null,
+    SUCCESS_EDIT_COVER_TYPE: null,
+
+    START_DELETE_COVER_TYPE: null,
+    SUCCESS_DELETE_COVER_TYPE: null,
   }),
 
   ActionSources: keyMirror({
@@ -62,5 +91,6 @@ export default {
     REST_BASE_URL: 'http://localhost:3000/api',
     DATE_FORMAT: 'YYYY-MM-DD',
     BOOK_REVIEWS_COUNT: 4,
+    BOOK_REASONS_COUNT: 1,
   }
 };

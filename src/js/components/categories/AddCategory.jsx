@@ -1,11 +1,11 @@
 import React from 'react';
-import CategoriesActionCreators from '../actions/CategoriesActionCreators.js';
-import HeaderColorsActionCreators from '../actions/HeaderColorsActionCreators.js';
-import CategoriesStore from '../stores/CategoriesStore';
-import HeaderColorsStore from '../stores/HeaderColorsStore';
+import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
+import HeaderColorsActionCreators from '../../actions/HeaderColorsActionCreators.js';
+import CategoriesStore from '../../stores/CategoriesStore';
+import HeaderColorsStore from '../../stores/HeaderColorsStore';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
-import UploadImage from './helpers/UploadImage.jsx';
+import UploadImage from './../helpers/UploadImage.jsx';
 
 export default React.createClass({
   mixins: [Navigation],

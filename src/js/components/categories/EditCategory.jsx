@@ -1,9 +1,9 @@
 import React from 'react';
-import CategoriesActionCreators from '../actions/CategoriesActionCreators.js';
-import HeaderColorsActionCreators from '../actions/HeaderColorsActionCreators.js';
-import CategoriesStore from '../stores/CategoriesStore';
-import HeaderColorsStore from '../stores/HeaderColorsStore';
-import UploadImage from './helpers/UploadImage.jsx';
+import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
+import HeaderColorsActionCreators from '../../actions/HeaderColorsActionCreators.js';
+import CategoriesStore from '../../stores/CategoriesStore';
+import HeaderColorsStore from '../../stores/HeaderColorsStore';
+import UploadImage from './../helpers/UploadImage.jsx';
 import {Button, Input, Modal} from 'react-bootstrap';
 import {Navigation} from 'react-router';
 
@@ -114,7 +114,7 @@ export default React.createClass({
         <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
-        <UploadImage ref="form" onDeleteImg={this.deleteBg} image={form.bgs[0]} help="Chose category image" label="Category image" />
+        <UploadImage ref="form" onDeleteImg={this.deleteBg} images={form.bgs} help="Chose category image" label="Category image" />
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Edit category</Button>
         <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete category</Button>

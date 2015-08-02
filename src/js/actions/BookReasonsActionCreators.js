@@ -1,22 +1,22 @@
 import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
 import rest from '../api/rest.js';
-import BookReviewsStore from '../stores/BookReviewsStore.js';
+import BookReasonsStore from '../stores/BookReasonsStore.js';
 import vow from 'vow'
 import _ from 'underscore'
 
 export default {
-  loadBookReviews(id) {
+  loadBookReasons(id) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_LOAD_BOOK_REVIEWS
+      type: Constants.ActionTypes.START_LOAD_BOOK_REASONS
     })
 
-    rest.getBookReviews(id).then(function(response) {
+    rest.getBookReasons(id).then(function(response) {
       Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_LOAD_BOOK_REVIEWS,
-        bookReviews: response.data
+        type: Constants.ActionTypes.SUCCESS_LOAD_BOOK_REASONS,
+        bookReasons: response.data
       })
 
       def.resolve()
@@ -25,24 +25,24 @@ export default {
     return def.promise()
   },
 
-  addBookReview(data, forms) {
+  addBookReason(data, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_ADD_BOOK_REVIEW
+      type: Constants.ActionTypes.START_ADD_BOOK_REASON
     })
 
-    rest.addBookReview(data).then(function(response) {
+    rest.addBookReason(data).then(function(response) {
       var defArr = []
 
       _.mapObject(forms, function(value, key) {
-        defArr.push(rest.upload('bookReview', response.data.id, key, forms[key]))
+        defArr.push(rest.upload('bookReason', response.data.id, key, forms[key]))
       })
 
       vow.all(defArr).then(function(all) {
         Dispatcher.handleServerAction({
-          type: Constants.ActionTypes.SUCCESS_ADD_BOOK_REVIEW,
-          bookReview: all[all.length - 1].data
+          type: Constants.ActionTypes.SUCCESS_ADD_BOOK_REASON,
+          bookReason: all[all.length - 1].data
         })
 
         def.resolve()
@@ -52,11 +52,11 @@ export default {
     return def.promise()
   },
 
-  editBookReviews(id, forms) {
+  editBookReasons(id, forms) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_EDIT_BOOK_REVIEW
+      type: Constants.ActionTypes.START_EDIT_BOOK_REASON
     })
 
     var defArr = []
@@ -68,9 +68,9 @@ export default {
       delete item.form.book
 
       if (item.form.id)
-        var promise = rest.editBookReview(item.form.id, item.form)
+        var promise = rest.editBookReason(item.form.id, item.form)
       else
-        var promise = rest.addBookReview(item.form)
+        var promise = rest.addBookReason(item.form)
 
       promise.then(function(result) {
         var defArr2 = []
@@ -80,12 +80,12 @@ export default {
             if (!item.delete)
               return
 
-            defArr2.push(rest.removeUpload('bookreview', result.data.id, 'avatar', item.id))
+            defArr2.push(rest.removeUpload('bookreason', result.data.id, 'avatar', item.id))
           })
 
         vow.all(defArr2).then(function() {
-          rest.upload('bookreview', result.data.id, 'avatar', item.files.avatar).then(function() {
-            rest.associateBookAndBookReview(id , result.data.id).then(function(result) {
+          rest.upload('bookreason', result.data.id, 'avatar', item.files.avatar).then(function() {
+            rest.associateBookAndBookReason(id , result.data.id).then(function(result) {
               def.resolve(result)
             })
           })
@@ -97,8 +97,8 @@ export default {
       console.log(all)
       all.forEach(function(item) {
         Dispatcher.handleServerAction({
-          type: Constants.ActionTypes.SUCCESS_EDIT_BOOK_REVIEW,
-          bookReview: item.data
+          type: Constants.ActionTypes.SUCCESS_EDIT_BOOK_REASON,
+          bookReason: item.data
         })
       })
 
@@ -108,16 +108,16 @@ export default {
     return def.promise()
   },
 
-  deleteBookReview(id) {
+  deleteBookReason(id) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_DELETE_BOOK_REVIEW
+      type: Constants.ActionTypes.START_DELETE_BOOK_REASON
     })
 
-    rest.deleteBookReview(id).then(function() {
+    rest.deleteBookReason(id).then(function() {
       Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_DELETE_BOOK_REVIEW,
+        type: Constants.ActionTypes.SUCCESS_DELETE_BOOK_REASON,
         id: id
       });
 

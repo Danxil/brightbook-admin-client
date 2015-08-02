@@ -15,6 +15,9 @@ export default React.createClass({
         <p>
           <Link to="/books">Books</Link>
         </p>
+        <p>
+          <Link to="/cover-types">Cover types</Link>
+        </p>
       </div>
     );
   }

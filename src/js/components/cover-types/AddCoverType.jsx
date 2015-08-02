@@ -1,11 +1,11 @@
 import React from 'react';
-import BooksActionCreators from '../actions/BooksActionCreators.js';
-import BooksStore from '../stores/BooksStore.js';
+import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js';
+import CoverTypesStore from '../../stores/CoverTypesStore.js';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
-import UploadImage from './helpers/UploadImage.jsx';
-import Datepicker from './helpers/Datepicker.jsx';
-import Constants from '../Constants.js';
+import UploadImage from './../helpers/UploadImage.jsx';
+import Datepicker from './../helpers/Datepicker.jsx';
+import Constants from '../../Constants.js';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -25,14 +25,6 @@ export default React.createClass({
     })
   },
 
-  componentDidMount() {
-    //CategoriesStore.addChangeListener(this._onChange);
-  },
-
-  componentWillUnmount() {
-    //CategoriesStore.removeChangeListener(this._onChange);
-  },
-
   submit() {
     var data = this.state.form
 
@@ -42,8 +34,8 @@ export default React.createClass({
       preview: this.refs.previewsForm.getDOMNode(),
     }
 
-    BooksActionCreators.addBook(data, fileForms).then(function(result) {
-      this.transitionTo('edit-book-reviews', {id: result.id})
+    CoverTypesActionCreators.addCoverType(data, fileForms).then(function(result) {
+      this.transitionTo('edit-coverType-reviews', {id: result.id}, {addingCoverType: true})
     }.bind(this))
   },
 
@@ -104,28 +96,24 @@ export default React.createClass({
     }.bind(this))
   },
 
-  generateBookReviewsDOM(form) {
-
-  },
-
   render() {
     var {form, datepicker} = this.state
 
     var fields = [
       {
         type: 'text',
-        label: 'Enter book name',
+        label: 'Enter coverType name',
         name: 'name',
       },
       {
         type: 'number',
-        label: 'Enter electric book price',
+        label: 'Enter electric coverType price',
         name: 'priceE',
         min: 0
       },
       {
         type: 'number',
-        label: 'Enter analog book price',
+        label: 'Enter analog coverType price',
         name: 'priceA',
         min: 0
       },
@@ -137,7 +125,7 @@ export default React.createClass({
       },
       {
         type: 'number',
-        label: 'Enter book length',
+        label: 'Enter coverType length',
         name: 'length',
         min: 0
       },
@@ -156,23 +144,23 @@ export default React.createClass({
         type: 'uploadImage',
         name: 'imagesForm',
         fieldName: 'images',
-        help: 'Chose book image',
-        label: 'Book image',
+        help: 'Chose coverType image',
+        label: 'CoverType image',
       },
       {
         type: 'uploadImage',
         name: 'bannersForm',
         fieldName: 'banners',
-        help: 'Chose book banner',
-        label: 'Book banner',
+        help: 'Chose coverType banner',
+        label: 'CoverType banner',
         images: form.banners,
       },
       {
         type: 'uploadImage',
         name: 'previewsForm',
         fieldName: 'previews',
-        help: 'Chose book previews',
-        label: 'Book previews',
+        help: 'Chose coverType previews',
+        label: 'CoverType previews',
         images: form.previews,
         multiple: true
       }
@@ -180,11 +168,10 @@ export default React.createClass({
 
     return (
       <div>
-        <h2>Add new book</h2>
+        <h2>Add new coverType</h2>
         {this.generateFieldsDOM(form, datepicker, fields)}
-        {this.generateBookReviewsDOM(form)}
         <hr/>
-        <Button bsStyle='primary' onClick={this.submit}>Add book</Button>
+        <Button bsStyle='primary' onClick={this.submit}>Add coverType</Button>
       </div>
     );
   }

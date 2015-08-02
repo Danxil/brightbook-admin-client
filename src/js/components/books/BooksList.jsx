@@ -1,8 +1,8 @@
 import React from 'react';
 import Book from './Books.jsx';
-import ListGroup from 'react-bootstrap/lib/ListGroup';
-import BooksActionCreators from '../actions/BooksActionCreators.js';
-import BooksStore from '../stores/BooksStore.js';
+import ListGroup from '../../../../node_modules/react-bootstrap/lib/ListGroup';
+import BooksActionCreators from '../../actions/BooksActionCreators.js';
+import BooksStore from '../../stores/BooksStore.js';
 
 export default React.createClass({
   getInitialState() {

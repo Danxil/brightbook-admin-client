@@ -43,6 +43,46 @@ export default (function(vow){
 
 
 
+
+    getCoverTypes(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/covertype'
+      if (id) url += '/' + id
+
+      return jq.get(url)
+    },
+
+    addCoverType(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/covertype'
+
+      return jq.ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      })
+    },
+
+    editCoverType(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/covertype/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+
+    deleteCoverType(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/covertype/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
+    
+    
+    
+
     getBooks(id) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book'
       if (id) url += '/' + id
@@ -102,6 +142,9 @@ export default (function(vow){
       return def.promise()
     },
 
+    
+    
+    
     editBookReview(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/bookreview/' + id
 
@@ -131,6 +174,57 @@ export default (function(vow){
       })
     },
 
+    
+    
+    
+    getBookReasons(id) {
+      let def = vow.defer()
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/reason'
+
+      jq.ajax({
+        url: url,
+        type: 'get',
+        success: function(result) {
+          def.resolve(result)
+        }
+      })
+
+      return def.promise()
+    },
+
+
+    editBookReason(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookreason/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+
+    addBookReason(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookreason'
+
+      return jq.ajax({
+        url: url,
+        type: 'post',
+        data: data
+      })
+    },
+
+    associateBookAndBookReason(id, childId) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/reasons/' + childId
+
+      return jq.ajax({
+        url: url,
+        type: 'post'
+      })
+    },
+
+    
+    
+    
     upload(model, id, property, data) {
       let def = vow.defer()
 

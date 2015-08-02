@@ -1,8 +1,8 @@
 import React from 'react';
 import Category from './Category.jsx';
-import ListGroup from 'react-bootstrap/lib/ListGroup';
-import CategoriesActionCreators from '../actions/CategoriesActionCreators.js';
-import CategoriesStore from '../stores/CategoriesStore';
+import ListGroup from '../../../../node_modules/react-bootstrap/lib/ListGroup';
+import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
+import CategoriesStore from '../../stores/CategoriesStore';
 
 export default React.createClass({
   getInitialState() {

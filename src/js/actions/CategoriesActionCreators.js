@@ -48,14 +48,16 @@ export default {
 
     var defArr = []
 
-    data.bg.forEach(function(item) {
+    data.bgs.forEach(function(item) {
+      if (item.delete)
+        return
+
       let def = vow.defer()
       defArr.push(def.promise())
 
-      if (item.delete)
-        rest.removeUpload('category', id, 'bg', item.id).then(function(response) {
-          def.resolve(response)
-        })
+      rest.removeUpload('category', id, 'bg', item.id).then(function(response) {
+        def.resolve(response)
+      })
     })
 
     defArr.push(rest.upload('category', id, 'bg', form))
