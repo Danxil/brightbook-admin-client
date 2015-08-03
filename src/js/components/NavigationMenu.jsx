@@ -13,10 +13,16 @@ export default React.createClass({
           <Link to="/categories">Categories</Link>
         </p>
         <p>
+          <Link to="/rubrics">Rubrics</Link>
+        </p>
+        <p>
           <Link to="/books">Books</Link>
         </p>
         <p>
           <Link to="/cover-types">Cover types</Link>
+        </p>
+        <p>
+          <Link to="/authors">Authors</Link>
         </p>
       </div>
     );

@@ -92,7 +92,7 @@ export default {
         })
       })
 
-      vow.all(defArr).then(function(all) {console.log(all)
+      vow.all(defArr).then(function(all) {
         Dispatcher.handleServerAction({
           type: Constants.ActionTypes.SUCCESS_EDIT_BOOK,
           book: all[all.length - 1].data

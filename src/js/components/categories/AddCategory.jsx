@@ -1,7 +1,6 @@
 import React from 'react';
 import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
 import HeaderColorsActionCreators from '../../actions/HeaderColorsActionCreators.js';
-import CategoriesStore from '../../stores/CategoriesStore';
 import HeaderColorsStore from '../../stores/HeaderColorsStore';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
@@ -34,12 +33,10 @@ export default React.createClass({
   },
 
   componentDidMount() {
-    CategoriesStore.addChangeListener(this._onChange);
     HeaderColorsStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
-    CategoriesStore.removeChangeListener(this._onChange);
     HeaderColorsStore.removeChangeListener(this._onChange);
   },
 

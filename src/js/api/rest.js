@@ -11,7 +11,6 @@ export default (function(vow){
 
       return jq.get(url)
     },
-
     addCategory(data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/category'
 
@@ -21,7 +20,6 @@ export default (function(vow){
         data: data
       })
     },
-
     editCategory(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/category/' + id
 
@@ -31,7 +29,6 @@ export default (function(vow){
         data: data
       })
     },
-
     deleteCategory(id) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/category/' + id
 
@@ -43,6 +40,76 @@ export default (function(vow){
 
 
 
+    getRubrics(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/rubric'
+      if (id) url += '/' + id
+
+      return jq.get(url)
+    },
+    addRubric(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/rubric'
+
+      return jq.ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      })
+    },
+    editRubric(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/rubric/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+    deleteRubric(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/rubric/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
+
+
+
+    getAuthors(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/author'
+      if (id) url += '/' + id
+
+      return jq.get(url)
+    },
+    addAuthor(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/author'
+
+      return jq.ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      })
+    },
+    editAuthor(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/author/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+    deleteAuthor(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/author/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
+    
+    
+
 
     getCoverTypes(id) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/covertype'
@@ -50,7 +117,6 @@ export default (function(vow){
 
       return jq.get(url)
     },
-
     addCoverType(data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/covertype'
 
@@ -60,7 +126,6 @@ export default (function(vow){
         data: data
       })
     },
-
     editCoverType(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/covertype/' + id
 
@@ -70,7 +135,6 @@ export default (function(vow){
         data: data
       })
     },
-
     deleteCoverType(id) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/covertype/' + id
 
@@ -89,7 +153,6 @@ export default (function(vow){
 
       return jq.get(url)
     },
-
     addBook(data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book'
 
@@ -99,7 +162,6 @@ export default (function(vow){
         data: data
       })
     },
-
     editBook(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id
 
@@ -109,7 +171,6 @@ export default (function(vow){
         data: data
       })
     },
-
     deleteBook(id) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id
 
@@ -118,7 +179,6 @@ export default (function(vow){
         type: 'delete'
       })
     },
-
     associateBook(id, associate, childId) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/' + associate + '/' + childId
       return jq.ajax({
@@ -126,7 +186,6 @@ export default (function(vow){
         type: 'post'
       })
     },
-
     unassociateBook(id, associate, childId) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/' + associate + '/' + childId
       return jq.ajax({
@@ -137,12 +196,6 @@ export default (function(vow){
     
     
 
-    getHeaderColors() {
-      let url = Constants.ConfigSources.REST_BASE_URL + '/headercolor'
-  
-      return jq.get(url)
-    },
-
     getBookReviews(id) {
       let def = vow.defer()
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/review'
@@ -152,15 +205,14 @@ export default (function(vow){
         type: 'get',
         success: function(result) {
           def.resolve(result)
+        },
+        error: function() {
+          def.reject()
         }
       })
 
       return def.promise()
     },
-
-    
-    
-    
     editBookReview(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/bookreview/' + id
 
@@ -170,7 +222,6 @@ export default (function(vow){
         data: data
       })
     },
-
     addBookReview(data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/bookreview'
 
@@ -180,7 +231,6 @@ export default (function(vow){
         data: data
       })
     },
-
     associateBookAndBookReview(id, childId) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/reviews/' + childId
 
@@ -189,7 +239,7 @@ export default (function(vow){
         type: 'post'
       })
     },
-
+    
     
     
     
@@ -202,13 +252,14 @@ export default (function(vow){
         type: 'get',
         success: function(result) {
           def.resolve(result)
+        },
+        error: function() {
+          def.reject()
         }
       })
 
       return def.promise()
     },
-
-
     editBookReason(id, data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/bookreason/' + id
 
@@ -218,7 +269,6 @@ export default (function(vow){
         data: data
       })
     },
-
     addBookReason(data) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/bookreason'
 
@@ -228,7 +278,6 @@ export default (function(vow){
         data: data
       })
     },
-
     associateBookAndBookReason(id, childId) {
       let url = Constants.ConfigSources.REST_BASE_URL + '/book/' + id + '/reasons/' + childId
 
@@ -237,10 +286,19 @@ export default (function(vow){
         type: 'post'
       })
     },
+    
+    
+
+
+    getHeaderColors() {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/headercolor'
+
+      return jq.get(url)
+    },
 
     
     
-    
+
     upload(model, id, property, data) {
       let def = vow.defer()
 
@@ -257,6 +315,9 @@ export default (function(vow){
         processData: false,
         success: function (result) {
           def.resolve({data: result})
+        },
+        error: function() {
+          def.reject()
         }
       });
 
@@ -273,6 +334,9 @@ export default (function(vow){
           type: 'delete',
           success: function (result) {
             def.resolve({data: result})
+          },
+          error: function() {
+            def.reject()
           }
         });
 

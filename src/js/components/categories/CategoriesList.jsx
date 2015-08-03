@@ -28,7 +28,7 @@ export default React.createClass({
   },
 
   render() {
-    let {categories, loading} = this.state;
+    let {categories} = this.state;
 
     return (
       <ListGroup>

@@ -1,15 +1,15 @@
 import React from 'react';
 import {Link} from 'react-router';
-import BooksList from './BooksList.jsx';
+import AuthorsList from './Authors.jsx';
 
 export default React.createClass({
   render() {
     return (
       <div>
         <p className="text-right">
-          <Link className="btn btn-primary" to="/add-book">Add book</Link>
+          <Link className="btn btn-primary" to="/add-author">Add author</Link>
         </p>
-        <BooksList />
+        <AuthorsList />
       </div>
     );
   }

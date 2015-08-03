@@ -36,6 +36,9 @@ export default assign({}, EventEmitter.prototype, {
   },
 
   addItems(items) {
+    if (!items)
+      return
+
     if (!_.isArray(items))
       items = [items]
 

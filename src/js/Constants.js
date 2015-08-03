@@ -79,6 +79,36 @@ export default {
 
     START_DELETE_COVER_TYPE: null,
     SUCCESS_DELETE_COVER_TYPE: null,
+
+
+
+
+    START_LOAD_RUBRICS: null,
+    SUCCESS_LOAD_RUBRICS: null,
+
+    START_ADD_RUBRIC: null,
+    SUCCESS_ADD_RUBRIC: null,
+
+    START_EDIT_RUBRIC: null,
+    SUCCESS_EDIT_RUBRIC: null,
+
+    START_DELETE_RUBRIC: null,
+    SUCCESS_DELETE_RUBRIC: null,
+
+
+
+
+    START_LOAD_AUTHORS: null,
+    SUCCESS_LOAD_AUTHORS: null,
+
+    START_ADD_AUTHOR: null,
+    SUCCESS_ADD_AUTHOR: null,
+
+    START_EDIT_AUTHOR: null,
+    SUCCESS_EDIT_AUTHOR: null,
+
+    START_DELETE_AUTHOR: null,
+    SUCCESS_DELETE_AUTHOR: null,
   }),
 
   ActionSources: keyMirror({

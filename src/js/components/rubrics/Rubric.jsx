@@ -5,11 +5,11 @@ import {Link} from 'react-router';
 
 export default React.createClass({
   render() {
-    let {book} = this.props;
+    let {rubric} = this.props;
 
     return (
-    <Link to="edit-book" params={{id: book.id}} className="list-group-item">
-      {book.name}
+    <Link to="edit-rubric" params={{id: rubric.id}} className="list-group-item">
+      {rubric.name}
     </Link>
     );
   }

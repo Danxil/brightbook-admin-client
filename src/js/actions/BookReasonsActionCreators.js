@@ -87,14 +87,21 @@ export default {
           rest.upload('bookreason', result.data.id, 'avatar', item.files.avatar).then(function() {
             rest.associateBookAndBookReason(id , result.data.id).then(function(result) {
               def.resolve(result)
+            }, function() {
+              def.reject()
             })
+          }, function() {
+            def.reject()
           })
+        }, function() {
+          def.reject()
         })
+      }, function() {
+        def.reject()
       })
     })
 
     vow.all(defArr).then(function(all) {
-      console.log(all)
       all.forEach(function(item) {
         Dispatcher.handleServerAction({
           type: Constants.ActionTypes.SUCCESS_EDIT_BOOK_REASON,
@@ -103,6 +110,8 @@ export default {
       })
 
       def.resolve()
+    }, function() {
+      def.reject()
     })
 
     return def.promise()

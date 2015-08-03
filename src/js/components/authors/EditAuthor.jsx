@@ -1,9 +1,10 @@
 import React from 'react';
-import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js';
-import CoverTypesStore from '../../stores/CoverTypesStore.js';
+import AuthorsActionCreators from '../../actions/AuthorsActionCreators.js';
+import AuthorsStore from '../../stores/AuthorsStore.js';
 import Constants from '../../Constants.js';
 import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
+import UploadImage from './../helpers/UploadImage.jsx';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -11,9 +12,9 @@ export default React.createClass({
   getInitialState() {
     var obj = {}
 
-    let coverTypeId = this.props.params.id
+    let authorId = this.props.params.id
 
-    CoverTypesActionCreators.loadCoverTypes(coverTypeId)
+    AuthorsActionCreators.loadAuthors(authorId)
 
     obj.showDeleteModal = false
 
@@ -22,20 +23,20 @@ export default React.createClass({
 
   _onChange() {
     this.setState(function(prev) {
-      var coverType = CoverTypesStore.getOne(this.props.params.id)
+      var author = AuthorsStore.getOne(this.props.params.id)
 
-      prev.form = coverType
+      prev.form = author
 
       return prev
     })
   },
 
   componentDidMount() {
-    CoverTypesStore.addChangeListener(this._onChange);
+    AuthorsStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
-    CoverTypesStore.removeChangeListener(this._onChange);
+    AuthorsStore.removeChangeListener(this._onChange);
   },
 
   toggleDeleteModal() {
@@ -43,16 +44,22 @@ export default React.createClass({
   },
 
   submit() {
-    CoverTypesActionCreators.editCoverType(this.props.params.id, this.state.form).then(function() {
-      this.transitionTo('cover-types')
+    var data = this.state.form
+
+    var fileForms = {
+      photo: this.refs.authorPhoto.getDOMNode(),
+    }
+
+    AuthorsActionCreators.editAuthor(this.props.params.id, data, fileForms).then(function() {
+      this.transitionTo('authors')
     }.bind(this))
   },
 
   delete() {
     this.toggleDeleteModal()
 
-    CoverTypesActionCreators.deleteCoverType(this.props.params.id).then(function() {
-      this.transitionTo('cover-types')
+    AuthorsActionCreators.deleteAuthor(this.props.params.id).then(function() {
+      this.transitionTo('authors')
     }.bind(this))
   },
 
@@ -65,6 +72,16 @@ export default React.createClass({
       })
     }
 
+    function deleteFile(id, fieldName) {
+      this.setState(function(prev) {
+        prev.form[fieldName].forEach(function(item, index) {
+          if (item && item.id == id)
+            prev.form[fieldName][index].delete = true
+        })
+
+        return prev
+      })
+    }
 
     return fields.map(function(field) {
       switch (field.type) {
@@ -75,6 +92,17 @@ export default React.createClass({
             label={field.label}
             ref={field.name}
             onChange={valueChange.bind(this, field.name)}/>)
+          break
+        case 'uploadImage':
+          return (<UploadImage
+            ref={field.name}
+            help={field.help}
+            fieldName={field.fieldName}
+            multiple={field.multiple}
+            label={field.label}
+            images={field.images}
+            onDeleteImg={deleteFile.bind(this)}
+            />)
           break
       }
     }.bind(this))
@@ -89,30 +117,38 @@ export default React.createClass({
     var fields = [
       {
         type: 'text',
-        label: 'Enter cover type',
+        label: 'Enter author',
         name: 'name',
-      }
+      },
+      {
+        type: 'uploadImage',
+        name: 'authorPhoto',
+        fieldName: 'photos',
+        help: 'Chose author photo',
+        label: 'Author photo',
+        images: form.photos,
+      },
     ]
 
     return (
       <div>
         <div className="form-group clearfix">
           <h2>
-            Edit cover type
+            Edit author
           </h2>
         </div>
         {this.generateFieldsDOM(form, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
-          <Button bsStyle='primary' onClick={this.submit}>Edit cover type</Button>
+          <Button bsStyle='primary' onClick={this.submit}>Edit author</Button>
         </ButtonToolbar>
-        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete cover type</Button>
+        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete author</Button>
 
 
 
         <Modal show={this.state.showDeleteModal} onHide={this.toggleDeleteModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Are you sure want to delete this cover type?</Modal.Title>
+            <Modal.Title>Are you sure want to delete this author?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h4>{form.name}</h4>

@@ -42,9 +42,11 @@ export default React.createClass({
       })
     }.bind(this))
 
-    BookReasonsActionCreators.editBookReasons(this.props.params.id, forms).then(function() {
+    var callback = function() {
       this.transitionTo('books')
-    }.bind(this))
+    }
+
+    BookReasonsActionCreators.editBookReasons(this.props.params.id, forms).then(callback.bind(this), callback.bind(this))
   },
 
   createBookReasonsDom(reasons) {

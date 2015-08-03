@@ -3,9 +3,16 @@ import BooksActionCreators from '../../actions/BooksActionCreators.js';
 import BooksStore from '../../stores/BooksStore.js';
 import CategoriesActionCreators from '../../actions/CategoriesActionCreators.js';
 import CategoriesStore from '../../stores/CategoriesStore';
+import RubricsActionCreators from '../../actions/RubricsActionCreators.js';
+import RubricsStore from '../../stores/RubricsStore.js';
+import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js';
+import CoverTypesStore from '../../stores/CoverTypesStore.js';
+import AuthorsActionCreators from '../../actions/AuthorsActionCreators.js';
+import AuthorsStore from '../../stores/AuthorsStore.js';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
 import UploadImage from './../helpers/UploadImage.jsx';
+import UploadFile from './../helpers/UploadFile.jsx';
 import Datepicker from './../helpers/Datepicker.jsx';
 import Constants from '../../Constants.js';
 
@@ -14,20 +21,31 @@ export default React.createClass({
 
   componentDidMount() {
     CategoriesStore.addChangeListener(this._onChange);
+    CoverTypesStore.addChangeListener(this._onChange);
+    RubricsStore.addChangeListener(this._onChange);
+    AuthorsStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
     CategoriesStore.removeChangeListener(this._onChange);
+    CoverTypesStore.removeChangeListener(this._onChange);
+    RubricsStore.removeChangeListener(this._onChange);
+    AuthorsStore.removeChangeListener(this._onChange);
   },
 
   getInitialState() {
     CategoriesActionCreators.loadCategories()
+    RubricsActionCreators.loadRubrics()
+    CoverTypesActionCreators.loadCoverTypes()
+    AuthorsActionCreators.loadAuthors()
 
     return {
       form: {},
       datepicker: {},
       selects: {
-        categories: []
+        categories: [],
+        rubrics: [],
+        authors: [],
       }
     }
   },
@@ -35,6 +53,9 @@ export default React.createClass({
   _onChange() {
     this.setState(function(prev) {
       prev.categories = CategoriesStore.getAll()
+      prev.rubrics = RubricsStore.getAll()
+      prev.coverTypes = CoverTypesStore.getAll()
+      prev.authors = AuthorsStore.getAll()
 
       return prev
     })
@@ -47,10 +68,14 @@ export default React.createClass({
       image: this.refs.imagesForm.getDOMNode(),
       banner: this.refs.bannersForm.getDOMNode(),
       preview: this.refs.previewsForm.getDOMNode(),
+      epubLink: this.refs.epubForm.getDOMNode(),
+      pdfLink: this.refs.pdfForm.getDOMNode(),
     }
 
     var selects = {
       categories: this.refs.categories.getValue(),
+      rubrics: this.refs.rubrics.getValue(),
+      authors: this.refs.authors.getValue(),
     }
 
     BooksActionCreators.addBook(data, selects, fileForms).then(function(result) {
@@ -67,9 +92,17 @@ export default React.createClass({
       })
     }
 
-    function selectChange(fieldName) {
+    function multipleSelectChange(fieldName) {
       this.setState(function(prev) {
         prev.selects[fieldName] = this.refs[fieldName].getValue()
+
+        return prev
+      })
+    }
+
+    function selectChange(fieldName) {
+      this.setState(function(prev) {
+        prev.form[fieldName] = this.refs[fieldName].getValue()
 
         return prev
       })
@@ -94,11 +127,20 @@ export default React.createClass({
             onChange={valueChange.bind(this, field.name)}/>)
           break
 
+        case 'textarea':
+          return (<Input
+            type={field.type}
+            value={form[field.name]}
+            label={field.label}
+            ref={field.name}
+            onChange={valueChange.bind(this, field.name)}/>)
+          break
+
         case 'select':
           if (!field.multiple)
             return (<Input
               type={field.type}
-              value={selects[field.name]}
+              value={form[field.name] ? form[field.name].id : null}
               label={field.label}
               ref={field.name}
               onChange={selectChange.bind(this, field.name)}>
@@ -111,7 +153,7 @@ export default React.createClass({
               label={field.label}
               ref={field.name}
               multiple
-              onChange={selectChange.bind(this, field.name)}>
+              onChange={multipleSelectChange.bind(this, field.name)}>
               {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
             </Input>)
           break
@@ -141,12 +183,24 @@ export default React.createClass({
             multiple={field.multiple}
             label={field.label} />)
           break
+        case 'uploadFile':
+          return (<UploadFile
+            ref={field.name}
+            files={field.files}
+            help={field.help}
+            fieldName={field.fieldName}
+            multiple={field.multiple}
+            label={field.label} />)
+          break
       }
     }.bind(this))
   },
 
   render() {
-    var {form, categories, selects, datepicker} = this.state
+    var {form, categories, rubrics, coverTypes, authors, selects, datepicker} = this.state
+
+    if (!categories || !rubrics || !coverTypes || !authors)
+      return(<div></div>)
 
     var fields = [
       {
@@ -156,11 +210,39 @@ export default React.createClass({
       },
       {
         type: 'select',
+        label: 'Choose author',
+        name: 'authors',
+        options: authors,
+        optionLabelField: 'name',
+        multiple: true
+      },
+      {
+        type: 'select',
         label: 'Choose category',
         name: 'categories',
         options: categories,
         optionLabelField: 'name',
         multiple: true
+      },
+      {
+        type: 'select',
+        label: 'Choose rubric',
+        name: 'rubrics',
+        options: rubrics,
+        optionLabelField: 'name',
+        multiple: true
+      },
+      {
+        type: 'select',
+        label: 'Choose cover type',
+        name: 'coverType',
+        options: coverTypes,
+        optionLabelField: 'name',
+      },
+      {
+        type: 'textarea',
+        label: 'About book',
+        name: 'about',
       },
       {
         type: 'number',
@@ -220,11 +302,22 @@ export default React.createClass({
         label: 'Book previews',
         images: form.previews,
         multiple: true
-      }
+      },
+      {
+        type: 'uploadFile',
+        name: 'epubForm',
+        fieldName: 'epubLinks',
+        help: 'Chose epub book',
+        label: 'Epub book upload',
+      },
+      {
+        type: 'uploadFile',
+        name: 'pdfForm',
+        fieldName: 'pdfLinks',
+        help: 'Chose pdf book',
+        label: 'Pdf book upload',
+      },
     ]
-
-    if (!categories)
-      return(<div></div>)
 
     return (
       <div>

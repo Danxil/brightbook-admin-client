@@ -12,15 +12,11 @@ export default React.createClass({
 
   getInitialState() {
     let categoryId = this.props.params.id
-    let category = CategoriesStore.getOne(categoryId)
 
     HeaderColorsActionCreators.loadHeaderColors()
-
-    if (!category)
-      CategoriesActionCreators.loadCategories(categoryId)
+    CategoriesActionCreators.loadCategories(categoryId)
 
     return {
-      form: category,
       showDeleteModal: false
     }
   },

@@ -43,12 +43,14 @@ export default React.createClass({
       })
     }.bind(this))
 
-    BookReviewsActionCreators.editBookReviews(this.props.params.id, forms).then(function() {
+    var callback = function() {
       if (!this.props.query.addingBook)
         this.transitionTo('books')
       else
         this.transitionTo('edit-book-reasons', {id: this.props.params.id})
-    }.bind(this))
+    }
+
+    BookReviewsActionCreators.editBookReviews(this.props.params.id, forms).then(callback.bind(this), callback.bind(this))
   },
 
   createBookReviewsDom(reviews) {
