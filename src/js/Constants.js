@@ -108,7 +108,23 @@ export default {
     SUCCESS_EDIT_AUTHOR: null,
 
     START_DELETE_AUTHOR: null,
-    SUCCESS_DELETE_AUTHOR: null,
+    SUCCESS_DELETE_AUTHOR: null, 
+    
+    
+    
+    
+    
+    START_LOAD_FORM_SIDE_SCHEMAS: null,
+    SUCCESS_LOAD_FORM_SIDE_SCHEMAS: null,
+
+    START_ADD_FORM_SIDE_SCHEMA: null,
+    SUCCESS_ADD_FORM_SIDE_SCHEMA: null,
+
+    START_EDIT_FORM_SIDE_SCHEMA: null,
+    SUCCESS_EDIT_FORM_SIDE_SCHEMA: null,
+
+    START_DELETE_FORM_SIDE_SCHEMA: null,
+    SUCCESS_DELETE_FORM_SIDE_SCHEMA: null,
   }),
 
   ActionSources: keyMirror({

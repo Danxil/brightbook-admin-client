@@ -57,6 +57,13 @@ export default React.createClass({
     })
   },
 
+  highlightChange() {
+    this.setState(function (prev) {
+      prev.form.highlight = !prev.form.highlight
+      return prev
+    })
+  },
+
   submit() {
     var data = this.state.form
     var form = this.refs.form.getDOMNode()
@@ -84,6 +91,13 @@ export default React.createClass({
           label='Enter category name'
           ref='name'
           onChange={this.nameChange} />
+        <Input
+          ref='highlight'
+          onChange={this.highlightChange}
+          defaultChecked={form.highlight}
+          type='checkbox'
+          label='Highlight category?'
+          />
         <Input name="headerColor" type='select' value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>

@@ -296,8 +296,18 @@ export default (function(vow){
       return jq.get(url)
     },
 
-    
-    
+
+
+
+    getFormSideSchemas() {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/formsideschema'
+
+      return jq.get(url)
+    },
+
+
+
+
 
     upload(model, id, property, data) {
       let def = vow.defer()

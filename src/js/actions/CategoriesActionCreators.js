@@ -49,7 +49,7 @@ export default {
     var defArr = []
 
     data.bgs.forEach(function(item) {
-      if (item.delete)
+      if (!item.delete)
         return
 
       let def = vow.defer()

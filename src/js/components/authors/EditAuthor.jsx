@@ -4,7 +4,7 @@ import AuthorsStore from '../../stores/AuthorsStore.js';
 import Constants from '../../Constants.js';
 import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
-import UploadImage from './../helpers/UploadImage.jsx';
+import FieldsGenerator from '../../tools/FieldsGenerator.js';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -63,51 +63,6 @@ export default React.createClass({
     }.bind(this))
   },
 
-  generateFieldsDOM(form, fields) {
-    function valueChange(fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue()
-
-        return prev
-      })
-    }
-
-    function deleteFile(id, fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName].forEach(function(item, index) {
-          if (item && item.id == id)
-            prev.form[fieldName][index].delete = true
-        })
-
-        return prev
-      })
-    }
-
-    return fields.map(function(field) {
-      switch (field.type) {
-        case 'text':
-          return (<Input
-            type={field.type}
-            value={form[field.name]}
-            label={field.label}
-            ref={field.name}
-            onChange={valueChange.bind(this, field.name)}/>)
-          break
-        case 'uploadImage':
-          return (<UploadImage
-            ref={field.name}
-            help={field.help}
-            fieldName={field.fieldName}
-            multiple={field.multiple}
-            label={field.label}
-            images={field.images}
-            onDeleteImg={deleteFile.bind(this)}
-            />)
-          break
-      }
-    }.bind(this))
-  },
-
   render() {
     let {form} = this.state
 
@@ -119,6 +74,11 @@ export default React.createClass({
         type: 'text',
         label: 'Enter author',
         name: 'name',
+      },
+      {
+        type: 'textarea',
+        label: 'About author',
+        name: 'about',
       },
       {
         type: 'uploadImage',
@@ -137,7 +97,7 @@ export default React.createClass({
             Edit author
           </h2>
         </div>
-        {this.generateFieldsDOM(form, fields)}
+        {FieldsGenerator.call(this, this.state, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
           <Button bsStyle='primary' onClick={this.submit}>Edit author</Button>

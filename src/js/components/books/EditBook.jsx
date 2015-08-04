@@ -9,14 +9,15 @@ import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js'
 import CoverTypesStore from '../../stores/CoverTypesStore.js';
 import AuthorsActionCreators from '../../actions/AuthorsActionCreators.js';
 import AuthorsStore from '../../stores/AuthorsStore.js';
-import UploadImage from './../helpers/UploadImage.jsx';
-import UploadFile from './../helpers/UploadFile.jsx';
+import FormSideSchemasActionCreators from '../../actions/FormSideSchemasActionCreator.js';
+import FormSideSchemasStore from '../../stores/FormSideSchemasStore.js';
 import Constants from '../../Constants.js';
-import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
+import {Button, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
-import Datepicker from './../helpers/Datepicker.jsx';
 import Moment from 'moment';
 import _ from 'underscore';
+import FieldsGenerator from '../../tools/FieldsGenerator.js';
+
 
 export default React.createClass({
   mixins: [Navigation],
@@ -27,6 +28,7 @@ export default React.createClass({
     CategoriesStore.addChangeListener(this._onChange);
     CoverTypesStore.addChangeListener(this._onChange);
     AuthorsStore.addChangeListener(this._onChange);
+    FormSideSchemasStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
@@ -35,6 +37,7 @@ export default React.createClass({
     CategoriesStore.removeChangeListener(this._onChange);
     CoverTypesStore.removeChangeListener(this._onChange);
     AuthorsStore.removeChangeListener(this._onChange);
+    FormSideSchemasStore.removeChangeListener(this._onChange);
   },
 
   getInitialState() {
@@ -47,6 +50,7 @@ export default React.createClass({
     RubricsActionCreators.loadRubrics()
     CoverTypesActionCreators.loadCoverTypes()
     AuthorsActionCreators.loadAuthors()
+    FormSideSchemasActionCreators.loadFormSideSchemas()
 
     obj.datepicker = {}
     obj.selects = {}
@@ -62,6 +66,7 @@ export default React.createClass({
       prev.rubrics = RubricsStore.getAll()
       prev.coverTypes = CoverTypesStore.getAll()
       prev.authors = AuthorsStore.getAll()
+      prev.formSideSchemas = FormSideSchemasStore.getAll()
 
       if (prev.form) {
         prev.datepicker.dateFirstEdition = prev.form.dateFirstEdition ? Moment(prev.form.dateFirstEdition) : null
@@ -106,138 +111,10 @@ export default React.createClass({
     }.bind(this))
   },
 
-  generateFieldsDOM(form, datepicker, selects, fields) {
-    function valueChange(fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue()
-
-        return prev
-      })
-    }
-
-
-    function multipleSelectChange(fieldName) {
-      this.setState(function(prev) {
-        prev.selects[fieldName] = this.refs[fieldName].getValue()
-
-        return prev
-      })
-    }
-
-    function selectChange(fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue()
-
-        return prev
-      })
-    }
-
-    function dateChange(fieldName, date) {
-      this.setState(function(prev) {
-        prev.datepicker[fieldName] = date
-        prev.form[fieldName] = date.format(Constants.ConfigSources.DATE_FORMAT)
-        return prev
-      })
-    }
-
-    function deleteFile(id, fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName].forEach(function(item, index) {
-          if (item && item.id == id)
-            prev.form[fieldName][index].delete = true
-        })
-
-        return prev
-      })
-    }
-
-    return fields.map(function(field) {
-      switch (field.type) {
-        case 'text':
-          return (<Input
-            type={field.type}
-            value={form[field.name]}
-            label={field.label}
-            ref={field.name}
-            onChange={valueChange.bind(this, field.name)}/>)
-          break
-
-        case 'textarea':
-          return (<Input
-            type={field.type}
-            value={form[field.name]}
-            label={field.label}
-            ref={field.name}
-            onChange={valueChange.bind(this, field.name)}/>)
-          break
-
-        case 'select':
-          if (!field.multiple)
-            return (<Input
-              type={field.type}
-              value={form[field.name] ? form[field.name].id : null}
-              label={field.label}
-              ref={field.name}
-              onChange={selectChange.bind(this, field.name)}>
-              {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
-            </Input>)
-          else
-            return (<Input
-              type={field.type}
-              value={selects[field.name]}
-              label={field.label}
-              ref={field.name}
-              multiple
-              onChange={multipleSelectChange.bind(this, field.name)}>
-              {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
-            </Input>)
-          break
-
-        case 'number':
-          return (<Input
-            type={field.type}
-            min={field.min}
-            value={form[field.name]}
-            label={field.label}
-            ref={field.name}
-            onChange={valueChange.bind(this, field.name)}/>)
-          break
-
-        case 'datepicker':
-          return (<Datepicker
-            selected={datepicker[field.name]}
-            fieldName={field.name}
-            onChange={dateChange.bind(this)}
-            label={field.label}/>)
-          break
-        case 'uploadImage':
-          return (<UploadImage
-            ref={field.name}
-            images={field.images}
-            help={field.help}
-            onDeleteImg={deleteFile.bind(this)}
-            fieldName={field.fieldName}
-            multiple={field.multiple}
-            label={field.label} />)
-          break
-        case 'uploadFile':
-          return (<UploadFile
-            ref={field.name}
-            files={field.files}
-            help={field.help}
-            onDeleteFile={deleteFile.bind(this)}
-            fieldName={field.fieldName}
-            multiple={field.multiple}
-            label={field.label} />)
-          break
-      }
-    }.bind(this))
-  },
-
   render() {
-    let {form, categories, coverTypes, rubrics, authors, selects, datepicker} = this.state
+    let {form, categories, coverTypes, rubrics, authors, formSideSchemas, datepicker} = this.state
 
-    if (!form || !categories || !rubrics || !coverTypes || !authors)
+    if (!form)
       return(<div></div>)
 
     var fields = [
@@ -318,6 +195,13 @@ export default React.createClass({
         name: 'dateFirstEdition',
       },
       {
+        type: 'select',
+        label: 'Choose form side',
+        name: 'formSideSchema',
+        options: formSideSchemas,
+        optionLabelField: 'side',
+      },
+      {
         type: 'uploadImage',
         name: 'imagesForm',
         fieldName: 'images',
@@ -375,7 +259,7 @@ export default React.createClass({
             </ButtonToolbar>
           </h2>
         </div>
-        {this.generateFieldsDOM(form, datepicker, selects, fields)}
+        {FieldsGenerator.call(this, this.state, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
           <Button bsStyle='primary' onClick={this.submit}>Edit book</Button>

@@ -22,22 +22,29 @@ export default React.createClass({
   },
 
   nameChange() {
-    this.setState(function(prev) {
+    this.setState(function (prev) {
       prev.form.name = this.refs.name.getValue()
 
       return prev
     })
   },
 
+  highlightChange() {
+    this.setState(function (prev) {
+      prev.form.highlight = !prev.form.highlight
+      return prev
+    })
+  },
+
   headerColorChange() {
-    this.setState(function(previousState) {
+    this.setState(function (previousState) {
       previousState.form.headerColor = this.refs.headerColor.getValue()
       return previousState
     })
   },
 
   _onChange() {
-    this.setState(function(prev) {
+    this.setState(function (prev) {
       let obj = {
         form: CategoriesStore.getOne(this.props.params.id),
         headerColors: HeaderColorsStore.getAll()
@@ -65,7 +72,7 @@ export default React.createClass({
   },
 
   submit() {
-    CategoriesActionCreators.editCategory(this.props.params.id, this.state.form, this.refs.form.getDOMNode()).then(function() {
+    CategoriesActionCreators.editCategory(this.props.params.id, this.state.form, this.refs.form.getDOMNode()).then(function () {
       this.transitionTo('categories')
     }.bind(this))
   },
@@ -73,14 +80,14 @@ export default React.createClass({
   delete() {
     this.toggleDeleteModal()
 
-    CategoriesActionCreators.deleteCategory(this.props.params.id).then(function() {
+    CategoriesActionCreators.deleteCategory(this.props.params.id).then(function () {
       this.transitionTo('categories')
     }.bind(this))
   },
 
   deleteBg(id) {
-    this.setState(function(prev) {
-      prev.form.bgs.forEach(function(item, index) {
+    this.setState(function (prev) {
+      prev.form.bgs.forEach(function (item, index) {
         if (item.id == id)
           prev.form.bgs[index].delete = true
       })
@@ -93,7 +100,7 @@ export default React.createClass({
     let {form, headerColors} = this.state
 
     if (!form || !headerColors)
-      return(<div></div>)
+      return (<div></div>)
 
     let headerColorsDOM = headerColors.map(item => <option value={item.id}>{item.color}</option>)
 
@@ -106,15 +113,23 @@ export default React.createClass({
           label='Enter category name'
           ref='name'
           name='name'
-          onChange={this.nameChange} />
-        <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange} ref='headerColor' label='Header font color'>
+          onChange={this.nameChange}/>
+        <Input
+          ref='highlight'
+          onChange={this.highlightChange}
+          defaultChecked={form.highlight}
+          type='checkbox'
+          label='Highlight category?'
+          />
+        <Input type='select' name="headerColor" value={form.headerColor} onChange={this.headerColorChange}
+               ref='headerColor' label='Header font color'>
           {headerColorsDOM}
         </Input>
-        <UploadImage ref="form" onDeleteImg={this.deleteBg} images={form.bgs} help="Chose category image" label="Category image" />
+        <UploadImage ref="form" onDeleteImg={this.deleteBg} images={form.bgs} help="Chose category image"
+                     label="Category image"/>
         <hr/>
         <Button bsStyle='primary' onClick={this.submit}>Edit category</Button>
         <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete category</Button>
-
 
 
         <Modal show={this.state.showDeleteModal} onHide={this.toggleDeleteModal}>

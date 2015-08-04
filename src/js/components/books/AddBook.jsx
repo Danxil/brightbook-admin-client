@@ -9,6 +9,8 @@ import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js'
 import CoverTypesStore from '../../stores/CoverTypesStore.js';
 import AuthorsActionCreators from '../../actions/AuthorsActionCreators.js';
 import AuthorsStore from '../../stores/AuthorsStore.js';
+import FormSideSchemasActionCreators from '../../actions/FormSideSchemasActionCreator.js';
+import FormSideSchemasStore from '../../stores/FormSideSchemasStore.js';
 import {Button, Input} from 'react-bootstrap';
 import {Navigation} from 'react-router';
 import UploadImage from './../helpers/UploadImage.jsx';
@@ -24,6 +26,7 @@ export default React.createClass({
     CoverTypesStore.addChangeListener(this._onChange);
     RubricsStore.addChangeListener(this._onChange);
     AuthorsStore.addChangeListener(this._onChange);
+    FormSideSchemasStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
@@ -31,6 +34,7 @@ export default React.createClass({
     CoverTypesStore.removeChangeListener(this._onChange);
     RubricsStore.removeChangeListener(this._onChange);
     AuthorsStore.removeChangeListener(this._onChange);
+    FormSideSchemasStore.removeChangeListener(this._onChange);
   },
 
   getInitialState() {
@@ -38,6 +42,7 @@ export default React.createClass({
     RubricsActionCreators.loadRubrics()
     CoverTypesActionCreators.loadCoverTypes()
     AuthorsActionCreators.loadAuthors()
+    FormSideSchemasActionCreators.loadFormSideSchemas()
 
     return {
       form: {},
@@ -56,6 +61,7 @@ export default React.createClass({
       prev.rubrics = RubricsStore.getAll()
       prev.coverTypes = CoverTypesStore.getAll()
       prev.authors = AuthorsStore.getAll()
+      prev.formSideSchemas = FormSideSchemasStore.getAll()
 
       return prev
     })
@@ -197,9 +203,9 @@ export default React.createClass({
   },
 
   render() {
-    var {form, categories, rubrics, coverTypes, authors, selects, datepicker} = this.state
+    var {form, categories, rubrics, coverTypes, formSideSchemas, authors, selects, datepicker} = this.state
 
-    if (!categories || !rubrics || !coverTypes || !authors)
+    if (!categories || !rubrics || !coverTypes || !authors || !formSideSchemas)
       return(<div></div>)
 
     var fields = [
@@ -278,6 +284,13 @@ export default React.createClass({
         type: 'datepicker',
         label: 'Date first edition',
         name: 'dateFirstEdition',
+      },
+      {
+        type: 'select',
+        label: 'Choose form side',
+        name: 'formSideSchema',
+        options: formSideSchemas,
+        optionLabelField: 'side',
       },
       {
         type: 'uploadImage',
