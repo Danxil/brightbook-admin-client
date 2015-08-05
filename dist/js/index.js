@@ -66418,8 +66418,8 @@ exports['default'] = {
   }),
 
   ConfigSources: {
-    SERVER_BASE_URL: 'http://localhost:3000',
-    REST_BASE_URL: 'http://localhost:3000/api',
+    SERVER_BASE_URL: '',
+    REST_BASE_URL: '/api',
     DATE_FORMAT: 'YYYY-MM-DD',
     BOOK_REVIEWS_COUNT: 4,
     BOOK_REASONS_COUNT: 1
