@@ -5,6 +5,7 @@ import UploadImage from '../components/helpers/UploadImage.jsx';
 import UploadFile from '../components/helpers/UploadFile.jsx';
 import Tinymce from 'react-tinymce';
 import _ from 'underscore';
+import Constants from '../Constants.js';
 
 export default function(obj, fields) {
   var {form, datepicker, selects} = obj

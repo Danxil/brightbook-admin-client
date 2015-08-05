@@ -7,6 +7,8 @@ import RubricsActionCreators from '../../actions/RubricsActionCreators.js';
 import RubricsStore from '../../stores/RubricsStore.js';
 import CoverTypesActionCreators from '../../actions/CoverTypesActionCreators.js';
 import CoverTypesStore from '../../stores/CoverTypesStore.js';
+import FormatsActionCreators from '../../actions/FormatsActionCreators.js';
+import FormatsStore from '../../stores/FormatsStore.js';
 import AuthorsActionCreators from '../../actions/AuthorsActionCreators.js';
 import AuthorsStore from '../../stores/AuthorsStore.js';
 import FormSideSchemasActionCreators from '../../actions/FormSideSchemasActionCreator.js';
@@ -27,6 +29,7 @@ export default React.createClass({
     RubricsStore.addChangeListener(this._onChange);
     CategoriesStore.addChangeListener(this._onChange);
     CoverTypesStore.addChangeListener(this._onChange);
+    FormatsStore.addChangeListener(this._onChange);
     AuthorsStore.addChangeListener(this._onChange);
     FormSideSchemasStore.addChangeListener(this._onChange);
   },
@@ -36,6 +39,7 @@ export default React.createClass({
     RubricsStore.removeChangeListener(this._onChange);
     CategoriesStore.removeChangeListener(this._onChange);
     CoverTypesStore.removeChangeListener(this._onChange);
+    FormatsStore.removeChangeListener(this._onChange);
     AuthorsStore.removeChangeListener(this._onChange);
     FormSideSchemasStore.removeChangeListener(this._onChange);
   },
@@ -49,6 +53,7 @@ export default React.createClass({
     CategoriesActionCreators.loadCategories()
     RubricsActionCreators.loadRubrics()
     CoverTypesActionCreators.loadCoverTypes()
+    FormatsActionCreators.loadFormats()
     AuthorsActionCreators.loadAuthors()
     FormSideSchemasActionCreators.loadFormSideSchemas()
 
@@ -65,6 +70,7 @@ export default React.createClass({
       prev.categories = CategoriesStore.getAll()
       prev.rubrics = RubricsStore.getAll()
       prev.coverTypes = CoverTypesStore.getAll()
+      prev.formats = FormatsStore.getAll()
       prev.authors = AuthorsStore.getAll()
       prev.formSideSchemas = FormSideSchemasStore.getAll()
 
@@ -112,7 +118,7 @@ export default React.createClass({
   },
 
   render() {
-    let {form, categories, coverTypes, rubrics, authors, formSideSchemas, datepicker} = this.state
+    let {form, categories, coverTypes, formats, rubrics, authors, formSideSchemas, datepicker} = this.state
 
     if (!form)
       return(<div></div>)
@@ -122,6 +128,11 @@ export default React.createClass({
         type: 'text',
         label: 'Enter book name',
         name: 'name',
+      },
+      {
+        type: 'text',
+        label: 'Enter ISBN',
+        name: 'isbn',
       },
       {
         type: 'select',
@@ -146,6 +157,13 @@ export default React.createClass({
         options: rubrics,
         optionLabelField: 'name',
         multiple: true
+      },
+      {
+        type: 'select',
+        label: 'Choose format',
+        name: 'format',
+        options: formats,
+        optionLabelField: 'name',
       },
       {
         type: 'select',

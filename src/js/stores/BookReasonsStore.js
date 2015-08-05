@@ -11,6 +11,7 @@ const BookReasonsStore = assign({}, BaseStore, {
 
     switch(action.type) {
       case Constants.ActionTypes.START_LOAD_BOOK_REASONS:
+        BookReviewsStore.clearAll()
         BookReasonsStore.emitChange()
 
         break;

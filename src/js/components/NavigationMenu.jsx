@@ -22,6 +22,9 @@ export default React.createClass({
           <Link to="/cover-types">Cover types</Link>
         </p>
         <p>
+          <Link to="/formats">Formats</Link>
+        </p>
+        <p>
           <Link to="/authors">Authors</Link>
         </p>
       </div>

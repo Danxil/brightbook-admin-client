@@ -57,6 +57,11 @@ export default assign({}, EventEmitter.prototype, {
     this._model = _.union(this._model, items)
   },
 
+
+  clearAll() {
+    this._model = [];
+  },
+
   getAll() {
     return this._model;
   },

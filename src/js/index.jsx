@@ -26,6 +26,10 @@ import CoverTypesContainer from './components/cover-types/CoverTypesContainer.js
 import EditCoverType from './components/cover-types/EditCoverType.jsx';
 import AddCoverType from './components/cover-types/AddCoverType.jsx';
 
+import FormatsContainer from './components/formats/FormatsContainer.jsx';
+import EditFormat from './components/formats/EditFormat.jsx';
+import AddFormat from './components/formats/AddFormat.jsx';
+
 import {run, HashLocation, Route, Link } from 'react-router';
 
 let routes = (
@@ -51,6 +55,10 @@ let routes = (
         <Route name="cover-types" path="/cover-types" handler={CoverTypesContainer} />
         <Route name="edit-cover-type" path="/edit-cover-type/:id" handler={EditCoverType} />
         <Route name="add-cover-type" path="/add-cover-type" handler={AddCoverType} />
+
+        <Route name="formats" path="/formats" handler={FormatsContainer} />
+        <Route name="edit-format" path="/edit-format/:id" handler={EditFormat} />
+        <Route name="add-format" path="/add-format" handler={AddFormat} />
     </Route>
 )
 

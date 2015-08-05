@@ -143,6 +143,41 @@ export default (function(vow){
         type: 'delete'
       })
     },
+
+
+
+    getFormats(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookformat'
+      if (id) url += '/' + id
+
+      return jq.get(url)
+    },
+    addFormat(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookformat'
+
+      return jq.ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      })
+    },
+    editFormat(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookformat/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+    deleteFormat(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/bookformat/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
     
     
     

@@ -7,7 +7,8 @@ export default React.createClass({
   render() {
     var {images, className, help, label, onDeleteImg, fieldName, multiple} = this.props;
     var imgStyle = {
-      maxWidth: '100%'
+      maxWidth: '100%',
+      maxHeight: '500px',
     }
 
     images = _.clone(images)

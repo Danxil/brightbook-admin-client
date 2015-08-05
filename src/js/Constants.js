@@ -83,6 +83,21 @@ export default {
 
 
 
+    START_LOAD_FORMATS: null,
+    SUCCESS_LOAD_FORMATS: null,
+
+    START_ADD_FORMAT: null,
+    SUCCESS_ADD_FORMAT: null,
+
+    START_EDIT_FORMAT: null,
+    SUCCESS_EDIT_FORMAT: null,
+
+    START_DELETE_FORMAT: null,
+    SUCCESS_DELETE_FORMAT: null,
+
+
+
+
     START_LOAD_RUBRICS: null,
     SUCCESS_LOAD_RUBRICS: null,
 
