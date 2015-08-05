@@ -5,7 +5,6 @@ import AuthorsStore from '../stores/AuthorsStore.js';
 import vow from 'vow'
 import _ from 'underscore'
 
-
 export default {
   loadAuthors(id) {
     Dispatcher.handleServerAction({
