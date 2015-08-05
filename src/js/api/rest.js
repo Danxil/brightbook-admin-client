@@ -1,5 +1,4 @@
 import jq from 'jquery'
-import fileUpload from 'blueimp-file-upload';
 import vow from 'vow'
 import Constants from '../Constants'
 
