@@ -68236,7 +68236,7 @@ exports['default'] = (function (vow) {
     },
 
     login: function login(data) {
-      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/auth/signin';
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/auth/signin-admin';
 
       return _jquery2['default'].post(url, data);
     }

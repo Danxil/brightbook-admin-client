@@ -388,7 +388,7 @@ export default (function(vow){
     },
 
     login(data) {
-      let url = Constants.ConfigSources.REST_BASE_URL + '/auth/signin'
+      let url = Constants.ConfigSources.REST_BASE_URL + '/auth/signin-admin'
 
       return jq.post(url, data)
     },
