@@ -77,6 +77,7 @@ export default React.createClass({
     var fileForms = {
       image: this.refs.imagesForm.getDOMNode(),
       banner: this.refs.bannersForm.getDOMNode(),
+      singleBanner: this.refs.singleBannersForm.getDOMNode(),
       preview: this.refs.previewsForm.getDOMNode(),
       epubLink: this.refs.epubForm.getDOMNode(),
       pdfLink: this.refs.pdfForm.getDOMNode(),
@@ -209,6 +210,14 @@ export default React.createClass({
         help: 'Chose book banner',
         label: 'Book banner',
         images: form.banners,
+      },
+      {
+        type: 'uploadImage',
+        name: 'singleBannersForm',
+        fieldName: 'singleBanners',
+        help: 'Chose book banner for single page',
+        label: 'Book banner for single page',
+        images: form.singleBanners,
       },
       {
         type: 'uploadImage',

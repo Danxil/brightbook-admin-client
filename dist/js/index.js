@@ -68704,6 +68704,7 @@ exports['default'] = _react2['default'].createClass({
     var fileForms = {
       image: this.refs.imagesForm.getDOMNode(),
       banner: this.refs.bannersForm.getDOMNode(),
+      singleBanner: this.refs.singleBannersForm.getDOMNode(),
       preview: this.refs.previewsForm.getDOMNode(),
       epubLink: this.refs.epubForm.getDOMNode(),
       pdfLink: this.refs.pdfForm.getDOMNode()
@@ -68827,6 +68828,13 @@ exports['default'] = _react2['default'].createClass({
       help: 'Chose book banner',
       label: 'Book banner',
       images: form.banners
+    }, {
+      type: 'uploadImage',
+      name: 'singleBannersForm',
+      fieldName: 'singleBanners',
+      help: 'Chose book banner for single page',
+      label: 'Book banner for single page',
+      images: form.singleBanners
     }, {
       type: 'uploadImage',
       name: 'previewsForm',
@@ -69668,6 +69676,7 @@ exports['default'] = _react2['default'].createClass({
     var fileForms = {
       image: this.refs.imagesForm.getDOMNode(),
       banner: this.refs.bannersForm.getDOMNode(),
+      singleBanner: this.refs.singleBannersForm.getDOMNode(),
       preview: this.refs.previewsForm.getDOMNode(),
       epubLink: this.refs.epubForm.getDOMNode(),
       pdfLink: this.refs.pdfForm.getDOMNode()
@@ -69799,6 +69808,13 @@ exports['default'] = _react2['default'].createClass({
       help: 'Chose book banner',
       label: 'Book banner',
       images: form.banners
+    }, {
+      type: 'uploadImage',
+      name: 'singleBannersForm',
+      fieldName: 'singleBanners',
+      help: 'Chose book banner for single page',
+      label: 'Book banner for single page',
+      images: form.singleBanners
     }, {
       type: 'uploadImage',
       name: 'previewsForm',
@@ -71610,9 +71626,9 @@ var _ConstantsJs = require('../../Constants.js');
 
 var _ConstantsJs2 = _interopRequireDefault(_ConstantsJs);
 
-var _helpersColorpickerJsx = require('../helpers/Colorpicker.jsx');
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
 
-var _helpersColorpickerJsx2 = _interopRequireDefault(_helpersColorpickerJsx);
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
 
 exports['default'] = _react2['default'].createClass({
   displayName: 'AddRubric',
@@ -71639,43 +71655,6 @@ exports['default'] = _react2['default'].createClass({
     }).bind(this));
   },
 
-  generateFieldsDOM: function generateFieldsDOM(form, fields) {
-    function valueChange(fieldName) {
-      this.setState(function (prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue();
-
-        return prev;
-      });
-    }
-
-    function colorChange(fieldName, color) {
-      this.setState(function (prev) {
-        prev.form[fieldName] = color.toHex();
-      });
-    }
-
-    return fields.map((function (field) {
-      switch (field.type) {
-        case 'text':
-          return _react2['default'].createElement(_reactBootstrap.Input, {
-            type: field.type,
-            value: form[field.name],
-            label: field.label,
-            ref: field.name,
-            onChange: valueChange.bind(this, field.name) });
-          break;
-
-        case 'colorPicker':
-          return _react2['default'].createElement(_helpersColorpickerJsx2['default'], {
-            color: field.color,
-            name: field.name,
-            label: field.label,
-            onChange: colorChange.bind(this, field.name) });
-          break;
-      }
-    }).bind(this));
-  },
-
   render: function render() {
     var form = this.state.form;
 
@@ -71684,10 +71663,19 @@ exports['default'] = _react2['default'].createClass({
       label: 'Enter rubric name',
       name: 'name'
     }, {
+      type: 'textarea',
+      label: 'Enter rubric description',
+      name: 'description'
+    }, {
       type: 'colorPicker',
-      label: 'Choose rubric color',
+      label: 'Choose light rubric color',
       name: 'color',
       color: form.color
+    }, {
+      type: 'colorPicker',
+      label: 'Choose dark rubric color',
+      name: 'additionalColor',
+      color: form.additionalColor
     }];
 
     return _react2['default'].createElement(
@@ -71698,7 +71686,7 @@ exports['default'] = _react2['default'].createClass({
         null,
         'Add new rubric'
       ),
-      this.generateFieldsDOM(form, fields),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
       _react2['default'].createElement('hr', null),
       _react2['default'].createElement(
         _reactBootstrap.Button,
@@ -71711,7 +71699,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":350,"../../actions/RubricsActionCreators.js":361,"../../stores/RubricsStore.js":414,"../helpers/Colorpicker.jsx":394,"react":347,"react-bootstrap":74,"react-router":131}],399:[function(require,module,exports){
+},{"../../Constants.js":350,"../../actions/RubricsActionCreators.js":361,"../../stores/RubricsStore.js":414,"../../tools/FieldsGenerator.js":415,"react":347,"react-bootstrap":74,"react-router":131}],399:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71740,9 +71728,9 @@ var _reactBootstrap = require('react-bootstrap');
 
 var _reactRouter = require('react-router');
 
-var _helpersColorpickerJsx = require('../helpers/Colorpicker.jsx');
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
 
-var _helpersColorpickerJsx2 = _interopRequireDefault(_helpersColorpickerJsx);
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
 
 exports['default'] = _react2['default'].createClass({
   displayName: 'EditRubric',
@@ -71797,42 +71785,6 @@ exports['default'] = _react2['default'].createClass({
     }).bind(this));
   },
 
-  generateFieldsDOM: function generateFieldsDOM(form, fields) {
-    function valueChange(fieldName) {
-      this.setState(function (prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue();
-
-        return prev;
-      });
-    }
-
-    function colorChange(fieldName, color) {
-      this.setState(function (prev) {
-        prev.form[fieldName] = color.toHex();
-      });
-    }
-
-    return fields.map((function (field) {
-      switch (field.type) {
-        case 'text':
-          return _react2['default'].createElement(_reactBootstrap.Input, {
-            type: field.type,
-            value: form[field.name],
-            label: field.label,
-            ref: field.name,
-            onChange: valueChange.bind(this, field.name) });
-          break;
-        case 'colorPicker':
-          return _react2['default'].createElement(_helpersColorpickerJsx2['default'], {
-            color: field.color,
-            name: field.name,
-            label: field.label,
-            onChange: colorChange.bind(this, field.name) });
-          break;
-      }
-    }).bind(this));
-  },
-
   render: function render() {
     var form = this.state.form;
 
@@ -71843,10 +71795,19 @@ exports['default'] = _react2['default'].createClass({
       label: 'Enter rubric name',
       name: 'name'
     }, {
+      type: 'textarea',
+      label: 'Enter rubric description',
+      name: 'description'
+    }, {
       type: 'colorPicker',
-      label: 'Choose rubric color',
+      label: 'Choose light rubric color',
       name: 'color',
       color: form.color
+    }, {
+      type: 'colorPicker',
+      label: 'Choose dark rubric color',
+      name: 'additionalColor',
+      color: form.additionalColor
     }];
 
     return _react2['default'].createElement(
@@ -71861,7 +71822,7 @@ exports['default'] = _react2['default'].createClass({
           'Edit rubric'
         )
       ),
-      this.generateFieldsDOM(form, fields),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
       _react2['default'].createElement('hr', null),
       _react2['default'].createElement(
         _reactBootstrap.ButtonToolbar,
@@ -71919,7 +71880,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":350,"../../actions/RubricsActionCreators.js":361,"../../stores/RubricsStore.js":414,"../helpers/Colorpicker.jsx":394,"react":347,"react-bootstrap":74,"react-router":131}],400:[function(require,module,exports){
+},{"../../Constants.js":350,"../../actions/RubricsActionCreators.js":361,"../../stores/RubricsStore.js":414,"../../tools/FieldsGenerator.js":415,"react":347,"react-bootstrap":74,"react-router":131}],400:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73044,6 +73005,10 @@ var _componentsHelpersDatepickerJsx = require('../components/helpers/Datepicker.
 
 var _componentsHelpersDatepickerJsx2 = _interopRequireDefault(_componentsHelpersDatepickerJsx);
 
+var _componentsHelpersColorpickerJsx = require('../components/helpers/Colorpicker.jsx');
+
+var _componentsHelpersColorpickerJsx2 = _interopRequireDefault(_componentsHelpersColorpickerJsx);
+
 var _componentsHelpersUploadImageJsx = require('../components/helpers/UploadImage.jsx');
 
 var _componentsHelpersUploadImageJsx2 = _interopRequireDefault(_componentsHelpersUploadImageJsx);
@@ -73108,6 +73073,12 @@ exports['default'] = function (obj, fields) {
       });
 
       return prev;
+    });
+  }
+
+  function colorChange(fieldName, color) {
+    this.setState(function (prev) {
+      prev.form[fieldName] = color.toHex();
     });
   }
 
@@ -73203,6 +73174,13 @@ exports['default'] = function (obj, fields) {
           multiple: field.multiple,
           label: field.label });
         break;
+      case 'colorPicker':
+        return _react2['default'].createElement(_componentsHelpersColorpickerJsx2['default'], {
+          color: field.color || '#fff',
+          name: field.name,
+          label: field.label,
+          onChange: colorChange.bind(this, field.name) });
+        break;
     }
   }).bind(this));
 };
@@ -73210,4 +73188,4 @@ exports['default'] = function (obj, fields) {
 module.exports = exports['default'];
 
 
-},{"../Constants.js":350,"../components/helpers/Datepicker.jsx":395,"../components/helpers/UploadFile.jsx":396,"../components/helpers/UploadImage.jsx":397,"react":347,"react-bootstrap":74,"react-tinymce":149,"underscore":348}]},{},[403]);
+},{"../Constants.js":350,"../components/helpers/Colorpicker.jsx":394,"../components/helpers/Datepicker.jsx":395,"../components/helpers/UploadFile.jsx":396,"../components/helpers/UploadImage.jsx":397,"react":347,"react-bootstrap":74,"react-tinymce":149,"underscore":348}]},{},[403]);

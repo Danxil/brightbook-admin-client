@@ -1,6 +1,7 @@
 import React from 'react';
 import {Input} from 'react-bootstrap';
 import Datepicker from '../components/helpers/Datepicker.jsx';
+import Colorpicker from '../components/helpers/Colorpicker.jsx';
 import UploadImage from '../components/helpers/UploadImage.jsx';
 import UploadFile from '../components/helpers/UploadFile.jsx';
 import Tinymce from 'react-tinymce';
@@ -50,6 +51,12 @@ export default function(obj, fields) {
       })
 
       return prev
+    })
+  }
+
+  function colorChange(fieldName, color) {
+    this.setState(function(prev) {
+      prev.form[fieldName] = color.toHex()
     })
   }
 
@@ -131,6 +138,13 @@ export default function(obj, fields) {
           fieldName={field.fieldName}
           multiple={field.multiple}
           label={field.label} />)
+        break
+      case 'colorPicker':
+        return (<Colorpicker
+          color={field.color || '#fff'}
+          name={field.name}
+          label={field.label}
+          onChange={colorChange.bind(this, field.name)}/>)
         break
     }
   }.bind(this))

@@ -4,7 +4,7 @@ import RubricsStore from '../../stores/RubricsStore.js';
 import Constants from '../../Constants.js';
 import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
-import Colorpicker from '../helpers/Colorpicker.jsx';
+import FieldsGenerator from '../../tools/FieldsGenerator.js';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -57,42 +57,6 @@ export default React.createClass({
     }.bind(this))
   },
 
-  generateFieldsDOM(form, fields) {
-    function valueChange(fieldName) {
-      this.setState(function(prev) {
-        prev.form[fieldName] = this.refs[fieldName].getValue()
-
-        return prev
-      })
-    }
-
-    function colorChange(fieldName, color) {
-      this.setState(function(prev) {
-        prev.form[fieldName] = color.toHex()
-      })
-    }
-
-    return fields.map(function(field) {
-      switch (field.type) {
-        case 'text':
-          return (<Input
-            type={field.type}
-            value={form[field.name]}
-            label={field.label}
-            ref={field.name}
-            onChange={valueChange.bind(this, field.name)}/>)
-          break
-        case 'colorPicker':
-          return (<Colorpicker
-            color={field.color}
-            name={field.name}
-            label={field.label}
-            onChange={colorChange.bind(this, field.name)}/>)
-          break
-      }
-    }.bind(this))
-  },
-
   render() {
     let {form} = this.state
 
@@ -106,10 +70,21 @@ export default React.createClass({
         name: 'name',
       },
       {
+        type: 'textarea',
+        label: 'Enter rubric description',
+        name: 'description',
+      },
+      {
         type: 'colorPicker',
-        label: 'Choose rubric color',
+        label: 'Choose light rubric color',
         name: 'color',
         color: form.color
+      },
+      {
+        type: 'colorPicker',
+        label: 'Choose dark rubric color',
+        name: 'additionalColor',
+        color: form.additionalColor
       }
     ]
 
@@ -120,7 +95,7 @@ export default React.createClass({
             Edit rubric
           </h2>
         </div>
-        {this.generateFieldsDOM(form, fields)}
+        {FieldsGenerator.call(this, this.state, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
           <Button bsStyle='primary' onClick={this.submit}>Edit rubric</Button>
