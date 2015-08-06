@@ -1,9 +1,24 @@
 import React from 'react';
-import {RouteHandler} from 'react-router';
+import {RouteHandler, Navigation} from 'react-router';
 import NavigationMenu from './NavigationMenu.jsx'
+import Cookie from 'js-cookie'
+import jq from 'jquery'
 
 export default React.createClass({
+  mixins: [Navigation],
+
   render() {
+    if (Cookie.get('token'))
+      jq.ajaxPrefilter(function( options ) {
+        if ( !options.beforeSend) {
+          options.beforeSend = function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + Cookie.get('token'));
+          }
+        }
+      });
+    else
+      this.transitionTo('/auth')
+
     return (
       <div className="container">
         <div className="page-header">

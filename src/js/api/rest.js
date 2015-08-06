@@ -385,6 +385,12 @@ export default (function(vow){
         });
 
       return def.promise()
-    }
+    },
+
+    login(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/auth/signin'
+
+      return jq.post(url, data)
+    },
   }
 })(vow)

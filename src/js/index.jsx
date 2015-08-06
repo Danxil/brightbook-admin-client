@@ -30,10 +30,16 @@ import FormatsContainer from './components/formats/FormatsContainer.jsx';
 import EditFormat from './components/formats/EditFormat.jsx';
 import AddFormat from './components/formats/AddFormat.jsx';
 
+import Auth from './components/auth/Auth.jsx';
+import Hello from './components/hello/Hello.jsx';
+
 import {run, HashLocation, Route, Link } from 'react-router';
 
 let routes = (
     <Route handler={AppContainer}>
+        <Route name="auth" path="/" handler={Hello} />
+        <Route name="hello" path="/auth" handler={Auth} />
+
         <Route name="categories" path="/categories" handler={CategoriesContainer} />
         <Route name="add-category" path="/add-category" handler={AddCategory} />
         <Route name="edit-category" path="/categories/:id" handler={EditCategory} />

@@ -71,6 +71,24 @@ export default function(obj, fields) {
           onChange={valueChange.bind(this, field.name)}/>)
         break
 
+      case 'email':
+        return (<Input
+          type={field.type}
+          value={form[field.name]}
+          label={field.label}
+          ref={field.name}
+          onChange={valueChange.bind(this, field.name)}/>)
+        break
+
+      case 'password':
+        return (<Input
+          type={field.type}
+          value={form[field.name]}
+          label={field.label}
+          ref={field.name}
+          onChange={valueChange.bind(this, field.name)}/>)
+        break
+
       case 'textarea':
         return (<Input
           type={field.type}
