@@ -1,10 +1,9 @@
 import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
-import BaseStore from './BaseStore';
+import CollectionStore from './CollectionStore';
 import assign from 'object-assign';
-import FormSideSchemasStore from '../stores/FormSideSchemasStore.js';
 
-const HeaderColorsStore = assign({}, BaseStore, {
+const FormSideSchemasStore = assign({}, CollectionStore, {
   _id: 'id',
 
   dispatcherIndex: Dispatcher.register(function(payload) {
@@ -25,4 +24,4 @@ const HeaderColorsStore = assign({}, BaseStore, {
   })
 });
 
-export default HeaderColorsStore;
+export default FormSideSchemasStore;

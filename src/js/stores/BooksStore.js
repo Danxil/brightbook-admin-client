@@ -1,9 +1,9 @@
 import Dispatcher from '../Dispatcher';
 import Constants from '../Constants';
-import BaseStore from './BaseStore';
+import CollectionStore from './CollectionStore';
 import assign from 'object-assign';
 
-const BooksStore = assign({}, BaseStore, {
+const BooksStore = assign({}, CollectionStore, {
   _id: 'id',
 
   dispatcherIndex: Dispatcher.register(function(payload) {

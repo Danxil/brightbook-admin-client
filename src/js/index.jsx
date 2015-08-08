@@ -35,6 +35,17 @@ import Hello from './components/hello/Hello.jsx';
 
 import {run, HashLocation, Route, Link } from 'react-router';
 
+import Cookie from 'js-cookie'
+import jq from 'jquery'
+
+jq.ajaxPrefilter(function(options) {
+    if (!options.beforeSend) {
+        options.beforeSend = function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + Cookie.get('token'));
+        }
+    }
+})
+
 let routes = (
     <Route handler={AppContainer}>
         <Route name="auth" path="/" handler={Hello} />

@@ -140,6 +140,13 @@ export default {
 
     START_DELETE_FORM_SIDE_SCHEMA: null,
     SUCCESS_DELETE_FORM_SIDE_SCHEMA: null,
+
+
+
+
+    START_LOAD_USER: null,
+    SUCCESS_LOAD_USER: null,
+    ERROR_LOAD_USER: null,
   }),
 
   ActionSources: keyMirror({

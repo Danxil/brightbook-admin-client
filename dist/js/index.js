@@ -66550,7 +66550,11 @@ exports['default'] = {
     SUCCESS_EDIT_FORM_SIDE_SCHEMA: null,
 
     START_DELETE_FORM_SIDE_SCHEMA: null,
-    SUCCESS_DELETE_FORM_SIDE_SCHEMA: null
+    SUCCESS_DELETE_FORM_SIDE_SCHEMA: null,
+
+    START_LOAD_USER: null,
+    SUCCESS_LOAD_USER: null,
+    ERROR_LOAD_USER: null
   }),
 
   ActionSources: (0, _reactLibKeyMirror2['default'])({
@@ -66664,76 +66668,19 @@ exports['default'] = {
       _jsCookie2['default'].set('token', response.data.token, { path: '/' });
     });
   },
-
-  addAuthor: function addAuthor(data, forms) {
-    var def = _vow2['default'].defer();
-
+  checkAdmin: function checkAdmin() {
     _Dispatcher2['default'].handleServerAction({
-      type: _Constants2['default'].ActionTypes.START_ADD_AUTHOR
+      type: _Constants2['default'].ActionTypes.START_LOAD_USER
     });
 
-    _apiRestJs2['default'].addAuthor(data).then(function (response) {
-      var defArr = [];
-
-      _underscore2['default'].mapObject(forms, function (value, key) {
-        defArr.push(_apiRestJs2['default'].upload('author', response.data.id, key, forms[key]));
-      });
-
-      _vow2['default'].all(defArr).then(function (all) {
-        _Dispatcher2['default'].handleServerAction({
-          type: _Constants2['default'].ActionTypes.SUCCESS_ADD_AUTHOR,
-          author: all[all.length - 1].data
-        });
-
-        def.resolve(all[all.length - 1].data);
-      });
-    });
-
-    return def.promise();
-  },
-
-  editAuthor: function editAuthor(id, data, forms) {
-    var def = _vow2['default'].defer();
-
-    _Dispatcher2['default'].handleServerAction({
-      type: _Constants2['default'].ActionTypes.START_EDIT_AUTHOR
-    });
-
-    _apiRestJs2['default'].editAuthor(id, data).then(function () {
-      var defArr = [];
-
-      _underscore2['default'].mapObject(forms, function (value, key) {
-        defArr.push(_apiRestJs2['default'].upload('author', id, key, forms[key]));
-
-        data[key + 's'].forEach(function (item) {
-          if (!item['delete']) return;
-
-          defArr.push(_apiRestJs2['default'].removeUpload('author', id, key, item.id));
-        });
-      });
-
-      _vow2['default'].all(defArr).then(function (all) {
-        _Dispatcher2['default'].handleServerAction({
-          type: _Constants2['default'].ActionTypes.SUCCESS_EDIT_AUTHOR,
-          author: all[all.length - 1].data
-        });
-
-        def.resolve();
-      });
-    });
-
-    return def.promise();
-  },
-
-  deleteAuthor: function deleteAuthor(id) {
-    _Dispatcher2['default'].handleServerAction({
-      type: _Constants2['default'].ActionTypes.START_DELETE_AUTHOR
-    });
-
-    return _apiRestJs2['default'].deleteAuthor(id).then(function () {
+    return _apiRestJs2['default'].checkAdmin().then(function (result) {
       _Dispatcher2['default'].handleServerAction({
-        type: _Constants2['default'].ActionTypes.SUCCESS_DELETE_AUTHOR,
-        id: id
+        type: _Constants2['default'].ActionTypes.SUCCESS_LOAD_USER,
+        user: result.data
+      });
+    }, function () {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.ERROR_LOAD_USER
       });
     });
   }
@@ -67560,7 +67507,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/CoverTypesStore.js":414,"underscore":349,"vow":350}],360:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/CoverTypesStore.js":415,"underscore":349,"vow":350}],360:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67706,7 +67653,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/FormatsStore.js":416,"underscore":349,"vow":350}],362:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/FormatsStore.js":417,"underscore":349,"vow":350}],362:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67856,7 +67803,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/RubricsStore.js":418,"underscore":349,"vow":350}],364:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/RubricsStore.js":419,"underscore":349,"vow":350}],364:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68239,6 +68186,12 @@ exports['default'] = (function (vow) {
       var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/auth/signin-admin';
 
       return _jquery2['default'].post(url, data);
+    },
+
+    checkAdmin: function checkAdmin() {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/auth/check-admin';
+
+      return _jquery2['default'].get(url);
     }
   };
 })(_vow2['default']);
@@ -68265,27 +68218,70 @@ var _NavigationMenuJsx = require('./NavigationMenu.jsx');
 
 var _NavigationMenuJsx2 = _interopRequireDefault(_NavigationMenuJsx);
 
-var _jsCookie = require('js-cookie');
+var _storesUserStoreJs = require('../stores/UserStore.js');
 
-var _jsCookie2 = _interopRequireDefault(_jsCookie);
+var _storesUserStoreJs2 = _interopRequireDefault(_storesUserStoreJs);
 
-var _jquery = require('jquery');
+var _actionsAuthActionCreatorsJs = require('../actions/AuthActionCreators.js');
 
-var _jquery2 = _interopRequireDefault(_jquery);
+var _actionsAuthActionCreatorsJs2 = _interopRequireDefault(_actionsAuthActionCreatorsJs);
 
 exports['default'] = _react2['default'].createClass({
   displayName: 'AppContainer',
 
   mixins: [_reactRouter.Navigation],
 
+  componentDidMount: function componentDidMount() {
+    _storesUserStoreJs2['default'].addChangeListener(this._onChange);
+  },
+  componentWillUnmount: function componentWillUnmount() {
+    _storesUserStoreJs2['default'].removeChangeListener(this._onChange);
+  },
+  getInitialState: function getInitialState() {
+    var obj = {};
+
+    _actionsAuthActionCreatorsJs2['default'].checkAdmin();
+
+    return obj;
+  },
+  _onChange: function _onChange() {
+    this.setState(function (prev) {
+      prev.user = _storesUserStoreJs2['default'].get('user');
+
+      return prev;
+    });
+  },
   render: function render() {
-    if (_jsCookie2['default'].get('token')) _jquery2['default'].ajaxPrefilter(function (options) {
-      if (!options.beforeSend) {
-        options.beforeSend = function (xhr) {
-          xhr.setRequestHeader('Authorization', 'Bearer ' + _jsCookie2['default'].get('token'));
-        };
-      }
-    });else this.transitionTo('/auth');
+    var user = this.state.user;
+
+    if (user) var conent = _react2['default'].createElement(
+      'div',
+      { className: 'row' },
+      _react2['default'].createElement(
+        'div',
+        { className: 'col-xs-2' },
+        _react2['default'].createElement(_NavigationMenuJsx2['default'], null)
+      ),
+      _react2['default'].createElement(
+        'div',
+        { className: 'col-xs-10' },
+        _react2['default'].createElement(_reactRouter.RouteHandler, null)
+      )
+    );else if (user === null) {
+      var conent = _react2['default'].createElement(
+        'div',
+        { className: 'row' },
+        _react2['default'].createElement('div', { className: 'col-xs-4' }),
+        _react2['default'].createElement(
+          'div',
+          { className: 'col-xs-4' },
+          _react2['default'].createElement(_reactRouter.RouteHandler, null)
+        ),
+        _react2['default'].createElement('div', { className: 'col-xs-4' })
+      );
+
+      this.transitionTo('/auth');
+    } else if (user === undefined) conent = _react2['default'].createElement('div', null);
 
     return _react2['default'].createElement(
       'div',
@@ -68299,27 +68295,14 @@ exports['default'] = _react2['default'].createClass({
           'Brightstar admin'
         )
       ),
-      _react2['default'].createElement(
-        'div',
-        { className: 'row' },
-        _react2['default'].createElement(
-          'div',
-          { className: 'col-xs-2' },
-          _react2['default'].createElement(_NavigationMenuJsx2['default'], null)
-        ),
-        _react2['default'].createElement(
-          'div',
-          { className: 'col-xs-10' },
-          _react2['default'].createElement(_reactRouter.RouteHandler, null)
-        )
-      )
+      conent
     );
   }
 });
 module.exports = exports['default'];
 
 
-},{"./NavigationMenu.jsx":366,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],366:[function(require,module,exports){
+},{"../actions/AuthActionCreators.js":353,"../stores/UserStore.js":420,"./NavigationMenu.jsx":366,"react":348,"react-router":132}],366:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68441,6 +68424,10 @@ var _jsCookie = require('js-cookie');
 
 var _jsCookie2 = _interopRequireDefault(_jsCookie);
 
+var _storesUserStoreJs = require('../../stores/UserStore.js');
+
+var _storesUserStoreJs2 = _interopRequireDefault(_storesUserStoreJs);
+
 exports['default'] = _react2['default'].createClass({
   displayName: 'Auth',
 
@@ -68454,15 +68441,16 @@ exports['default'] = _react2['default'].createClass({
   submit: function submit() {
     var data = this.state.form;
 
-    _actionsAuthActionCreatorsJs2['default'].login(data).then((function (result) {
-      this.transitionTo('/');
-    }).bind(this), (function () {
-      this.transitionTo('/auth');
-    }).bind(this));
+    _actionsAuthActionCreatorsJs2['default'].login(data).then().then(function (result) {
+      _actionsAuthActionCreatorsJs2['default'].checkAdmin();
+    });
   },
 
   render: function render() {
-    if (_jsCookie2['default'].get('token')) return this.transitionTo('/');
+    if (_storesUserStoreJs2['default'].get('user')) {
+      this.transitionTo('/');
+      return _react2['default'].createElement('div', null);
+    }
 
     var fields = [{
       type: 'text',
@@ -68499,7 +68487,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/AuthActionCreators.js":353,"../../tools/FieldsGenerator.js":419,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],368:[function(require,module,exports){
+},{"../../actions/AuthActionCreators.js":353,"../../stores/UserStore.js":420,"../../tools/FieldsGenerator.js":421,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],368:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68573,6 +68561,14 @@ exports['default'] = _react2['default'].createClass({
       label: 'About author',
       name: 'about'
     }, {
+      type: 'text',
+      label: 'Enter facebook link',
+      name: 'facebookLink'
+    }, {
+      type: 'text',
+      label: 'Enter blog link',
+      name: 'blogLink'
+    }, {
       type: 'uploadImage',
       name: 'authorPhoto',
       fieldName: 'photos',
@@ -68602,7 +68598,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],369:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],369:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68856,6 +68852,14 @@ exports['default'] = _react2['default'].createClass({
       label: 'About author',
       name: 'about'
     }, {
+      type: 'text',
+      label: 'Enter facebook link',
+      name: 'facebookLink'
+    }, {
+      type: 'text',
+      label: 'Enter blog link',
+      name: 'blogLink'
+    }, {
       type: 'uploadImage',
       name: 'authorPhoto',
       fieldName: 'photos',
@@ -68934,7 +68938,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],373:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],373:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69250,7 +69254,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":414,"../../stores/FormSideSchemasStore.js":415,"../../stores/FormatsStore.js":416,"../../stores/RubricsStore.js":418,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],374:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":415,"../../stores/FormSideSchemasStore.js":416,"../../stores/FormatsStore.js":417,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],374:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70295,7 +70299,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":414,"../../stores/FormSideSchemasStore.js":415,"../../stores/FormatsStore.js":416,"../../stores/RubricsStore.js":418,"../../tools/FieldsGenerator.js":419,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],382:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":415,"../../stores/FormSideSchemasStore.js":416,"../../stores/FormatsStore.js":417,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],382:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70448,7 +70452,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/HeaderColorsStore":417,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],383:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/HeaderColorsStore":418,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],383:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70818,7 +70822,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/CategoriesStore":413,"../../stores/HeaderColorsStore":417,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],387:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/CategoriesStore":413,"../../stores/HeaderColorsStore":418,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],387:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70927,7 +70931,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":414,"react":348,"react-bootstrap":75,"react-router":132}],388:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"react":348,"react-bootstrap":75,"react-router":132}],388:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71073,7 +71077,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":414,"./CoverType.jsx":388,"react":348}],391:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"./CoverType.jsx":388,"react":348}],391:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71259,7 +71263,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":414,"react":348,"react-bootstrap":75,"react-router":132}],392:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"react":348,"react-bootstrap":75,"react-router":132}],392:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71343,7 +71347,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],393:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],393:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71510,7 +71514,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":416,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":417,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71656,7 +71660,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":416,"./Format.jsx":394,"react":348}],397:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":417,"./Format.jsx":394,"react":348}],397:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72108,7 +72112,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":418,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],403:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],403:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72289,7 +72293,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":418,"../../tools/FieldsGenerator.js":419,"react":348,"react-bootstrap":75,"react-router":132}],404:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],404:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72393,7 +72397,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":418,"./Rubric.jsx":404,"react":348}],406:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"./Rubric.jsx":404,"react":348}],406:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72538,6 +72542,22 @@ var _componentsHelloHelloJsx2 = _interopRequireDefault(_componentsHelloHelloJsx)
 
 var _reactRouter = require('react-router');
 
+var _jsCookie = require('js-cookie');
+
+var _jsCookie2 = _interopRequireDefault(_jsCookie);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+_jquery2['default'].ajaxPrefilter(function (options) {
+    if (!options.beforeSend) {
+        options.beforeSend = function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + _jsCookie2['default'].get('token'));
+        };
+    }
+});
+
 var routes = _react2['default'].createElement(
     _reactRouter.Route,
     { handler: _componentsAppContainerJsx2['default'] },
@@ -72570,7 +72590,7 @@ var routes = _react2['default'].createElement(
 });
 
 
-},{"./components/AppContainer.jsx":365,"./components/auth/Auth.jsx":367,"./components/authors/AddAuthor.jsx":368,"./components/authors/AuthorsContainer.jsx":371,"./components/authors/EditAuthor.jsx":372,"./components/books/AddBook.jsx":373,"./components/books/BookReasons.jsx":376,"./components/books/BookReviews.jsx":378,"./components/books/BooksContainer.jsx":379,"./components/books/EditBook.jsx":381,"./components/categories/AddCategory.jsx":382,"./components/categories/CategoriesContainer.jsx":383,"./components/categories/EditCategory.jsx":386,"./components/cover-types/AddCoverType.jsx":387,"./components/cover-types/CoverTypesContainer.jsx":389,"./components/cover-types/EditCoverType.jsx":391,"./components/formats/AddFormat.jsx":392,"./components/formats/EditFormat.jsx":393,"./components/formats/FormatsContainer.jsx":395,"./components/hello/Hello.jsx":397,"./components/rubrics/AddRubric.jsx":402,"./components/rubrics/EditRubric.jsx":403,"./components/rubrics/RubricsContainer.jsx":406,"react":348,"react-router":132}],408:[function(require,module,exports){
+},{"./components/AppContainer.jsx":365,"./components/auth/Auth.jsx":367,"./components/authors/AddAuthor.jsx":368,"./components/authors/AuthorsContainer.jsx":371,"./components/authors/EditAuthor.jsx":372,"./components/books/AddBook.jsx":373,"./components/books/BookReasons.jsx":376,"./components/books/BookReviews.jsx":378,"./components/books/BooksContainer.jsx":379,"./components/books/EditBook.jsx":381,"./components/categories/AddCategory.jsx":382,"./components/categories/CategoriesContainer.jsx":383,"./components/categories/EditCategory.jsx":386,"./components/cover-types/AddCoverType.jsx":387,"./components/cover-types/CoverTypesContainer.jsx":389,"./components/cover-types/EditCoverType.jsx":391,"./components/formats/AddFormat.jsx":392,"./components/formats/EditFormat.jsx":393,"./components/formats/FormatsContainer.jsx":395,"./components/hello/Hello.jsx":397,"./components/rubrics/AddRubric.jsx":402,"./components/rubrics/EditRubric.jsx":403,"./components/rubrics/RubricsContainer.jsx":406,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],408:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72587,15 +72607,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var AuthorStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var AuthorStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -72650,7 +72670,7 @@ exports['default'] = AuthorStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],409:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],409:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72676,7 +72696,7 @@ var _underscore2 = _interopRequireDefault(_underscore);
 exports['default'] = (0, _objectAssign2['default'])({}, _events.EventEmitter.prototype, {
   // Allow Controller-View to register itself with store
 
-  _model: [],
+  _model: {},
 
   addChangeListener: function addChangeListener(callback) {
     this.on(_Constants2['default'].CHANGE_EVENT, callback);
@@ -72691,49 +72711,24 @@ exports['default'] = (0, _objectAssign2['default'])({}, _events.EventEmitter.pro
     this.emit(_Constants2['default'].CHANGE_EVENT);
   },
 
-  deleteItem: function deleteItem(id) {
-    for (var i = 0; i < this._model.length; i++) {
-      if (this._model[i][this._id] == id) this._model.splice(i, 1);
-    }
-  },
-
-  editItem: function editItem(editedItem) {
-    _underscore2['default'].each(this._model, (function (item, index) {
-      if (editedItem[this._id] == item[this._id]) this._model[index] = item;
-    }).bind(this));
-  },
-
-  addItems: function addItems(items) {
-    if (!items) return;
-
-    if (!_underscore2['default'].isArray(items)) items = [items];
-
-    for (var i = 0; i < items.length; i++) {
-      for (var ii = 0; ii < this._model.length; ii++) {
-        if (this._model[ii][this._id] != items[i][this._id]) continue;
-
-        this._model[ii] = items.splice(i, 1)[0];
-        i--;
-
-        break;
-      }
-    }
-
-    this._model = _underscore2['default'].union(this._model, items);
-  },
-
   clearAll: function clearAll() {
-    this._model = [];
+    this._model = {};
+  },
+
+  set: function set(field, value) {
+    return this._model[field] = value;
+  },
+
+  get: function get(field) {
+    return this._model[field];
+  },
+
+  clear: function clear(field) {
+    delete this._model[field];
   },
 
   getAll: function getAll() {
     return this._model;
-  },
-
-  getOne: function getOne(id) {
-    return _underscore2['default'].find(this._model, (function (item) {
-      return item[this._id] == id;
-    }).bind(this));
   }
 });
 module.exports = exports['default'];
@@ -72756,15 +72751,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var BookReasonsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var BookReasonsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -72820,7 +72815,7 @@ exports['default'] = BookReasonsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],411:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],411:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72837,15 +72832,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var BookReviewsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var BookReviewsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -72901,7 +72896,7 @@ exports['default'] = BookReviewsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],412:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],412:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72918,15 +72913,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var BooksStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var BooksStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -72981,7 +72976,7 @@ exports['default'] = BooksStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],413:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],413:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72998,15 +72993,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var CategoriesStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var CategoriesStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73061,7 +73056,83 @@ exports['default'] = CategoriesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],414:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],414:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _events = require('events');
+
+var _BaseStore = require('./BaseStore');
+
+var _BaseStore2 = _interopRequireDefault(_BaseStore);
+
+var _underscore = require('underscore');
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+exports['default'] = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+  // Allow Controller-View to register itself with store
+
+  _model: [],
+
+  deleteItem: function deleteItem(id) {
+    for (var i = 0; i < this._model.length; i++) {
+      if (this._model[i][this._id] == id) this._model.splice(i, 1);
+    }
+  },
+
+  editItem: function editItem(editedItem) {
+    _underscore2['default'].each(this._model, (function (item, index) {
+      if (editedItem[this._id] == item[this._id]) this._model[index] = item;
+    }).bind(this));
+  },
+
+  addItems: function addItems(items) {
+    if (!items) return;
+
+    if (!_underscore2['default'].isArray(items)) items = [items];
+
+    for (var i = 0; i < items.length; i++) {
+      for (var ii = 0; ii < this._model.length; ii++) {
+        if (this._model[ii][this._id] != items[i][this._id]) continue;
+
+        this._model[ii] = items.splice(i, 1)[0];
+        i--;
+
+        break;
+      }
+    }
+
+    this._model = _underscore2['default'].union(this._model, items);
+  },
+
+  getOne: function getOne(id) {
+    return _underscore2['default'].find(this._model, (function (item) {
+      return item[this._id] == id;
+    }).bind(this));
+  },
+
+  clearAll: function clearAll() {
+    this._model = [];
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"./BaseStore":409,"events":1,"object-assign":9,"underscore":349}],415:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73078,15 +73149,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var CoverTypesStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var CoverTypesStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73141,7 +73212,7 @@ exports['default'] = CoverTypesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],415:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],416:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73158,19 +73229,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var _storesFormSideSchemasStoreJs = require('../stores/FormSideSchemasStore.js');
-
-var _storesFormSideSchemasStoreJs2 = _interopRequireDefault(_storesFormSideSchemasStoreJs);
-
-var HeaderColorsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var FormSideSchemasStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73178,24 +73245,24 @@ var HeaderColorsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'
 
     switch (action.type) {
       case _Constants2['default'].ActionTypes.START_LOAD_FORM_SIDE_SCHEMAS:
-        _storesFormSideSchemasStoreJs2['default'].emitChange();
+        FormSideSchemasStore.emitChange();
 
         break;
       case _Constants2['default'].ActionTypes.SUCCESS_LOAD_FORM_SIDE_SCHEMAS:
-        _storesFormSideSchemasStoreJs2['default'].addItems(action.formSideSchemas);
+        FormSideSchemasStore.addItems(action.formSideSchemas);
 
-        _storesFormSideSchemasStoreJs2['default'].emitChange();
+        FormSideSchemasStore.emitChange();
 
         break;
     }
   })
 });
 
-exports['default'] = HeaderColorsStore;
+exports['default'] = FormSideSchemasStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../stores/FormSideSchemasStore.js":415,"./BaseStore":409,"object-assign":9}],416:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],417:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73212,15 +73279,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var FormatsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var FormatsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73275,7 +73342,7 @@ exports['default'] = FormatsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],417:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],418:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73292,15 +73359,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var HeaderColorsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var HeaderColorsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73325,7 +73392,7 @@ exports['default'] = HeaderColorsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],418:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],419:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73342,15 +73409,15 @@ var _Constants = require('../Constants');
 
 var _Constants2 = _interopRequireDefault(_Constants);
 
-var _BaseStore = require('./BaseStore');
+var _CollectionStore = require('./CollectionStore');
 
-var _BaseStore2 = _interopRequireDefault(_BaseStore);
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
-var RubricsStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+var RubricsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
   _id: 'id',
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
@@ -73405,7 +73472,62 @@ exports['default'] = RubricsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],419:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],420:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _BaseStore = require('./BaseStore');
+
+var _BaseStore2 = _interopRequireDefault(_BaseStore);
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var UserStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+  _id: 'id',
+
+  dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
+    var action = payload.action;
+
+    setTimeout(function () {
+      switch (action.type) {
+        case _Constants2['default'].ActionTypes.START_LOAD_USER:
+          UserStore.emitChange();
+
+          break;
+        case _Constants2['default'].ActionTypes.SUCCESS_LOAD_USER:
+          UserStore.set('user', action.user);
+          UserStore.emitChange();
+          break;
+        case _Constants2['default'].ActionTypes.ERROR_LOAD_USER:
+          UserStore.set('user', null);
+          UserStore.emitChange();
+
+          break;
+      }
+    });
+  })
+});
+
+exports['default'] = UserStore;
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],421:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

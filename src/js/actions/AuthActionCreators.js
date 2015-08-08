@@ -12,78 +12,20 @@ export default {
       Cookie.set('token', response.data.token, {path: '/'})
     })
   },
-
-  addAuthor(data, forms) {
-    var def = vow.defer()
-
+  checkAdmin() {
     Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_ADD_AUTHOR
+      type: Constants.ActionTypes.START_LOAD_USER
     })
 
-    rest.addAuthor(data).then(function(response) {
-      var defArr = []
-
-      _.mapObject(forms, function(value, key) {
-        defArr.push(rest.upload('author', response.data.id, key, forms[key]))
-      })
-
-      vow.all(defArr).then(function(all) {
-        Dispatcher.handleServerAction({
-          type: Constants.ActionTypes.SUCCESS_ADD_AUTHOR,
-          author: all[all.length - 1].data
-        })
-
-        def.resolve(all[all.length - 1].data)
-      })
-    })
-
-    return def.promise()
-  },
-
-  editAuthor(id, data, forms) {
-    var def = vow.defer()
-
-    Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_EDIT_AUTHOR
-    })
-
-    rest.editAuthor(id, data).then(function() {
-      var defArr = []
-
-      _.mapObject(forms, function(value, key) {
-        defArr.push(rest.upload('author', id, key, forms[key]))
-
-        data[key + 's'].forEach(function(item) {
-          if (!item.delete)
-            return
-
-          defArr.push(rest.removeUpload('author', id, key, item.id))
-        })
-      })
-
-      vow.all(defArr).then(function(all) {
-        Dispatcher.handleServerAction({
-          type: Constants.ActionTypes.SUCCESS_EDIT_AUTHOR,
-          author: all[all.length - 1].data
-        });
-
-        def.resolve()
-      })
-    })
-
-    return def.promise()
-  },
-
-  deleteAuthor(id) {
-    Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_DELETE_AUTHOR
-    })
-
-    return rest.deleteAuthor(id).then(function() {
+    return rest.checkAdmin().then(function(result) {
       Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_DELETE_AUTHOR,
-        id: id
-      });
+        type: Constants.ActionTypes.SUCCESS_LOAD_USER,
+        user: result.data
+      })
+    }, function() {
+      Dispatcher.handleServerAction({
+        type: Constants.ActionTypes.ERROR_LOAD_USER
+      })
     })
   },
 };

@@ -392,5 +392,11 @@ export default (function(vow){
 
       return jq.post(url, data)
     },
+
+    checkAdmin() {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/auth/check-admin'
+
+      return jq.get(url)
+    },
   }
 })(vow)

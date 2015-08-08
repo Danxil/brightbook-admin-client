@@ -81,6 +81,16 @@ export default React.createClass({
         name: 'about',
       },
       {
+        type: 'text',
+        label: 'Enter facebook link',
+        name: 'facebookLink',
+      },
+      {
+        type: 'text',
+        label: 'Enter blog link',
+        name: 'blogLink',
+      },
+      {
         type: 'uploadImage',
         name: 'authorPhoto',
         fieldName: 'photos',

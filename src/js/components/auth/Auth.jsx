@@ -4,6 +4,7 @@ import {Button, Input} from 'react-bootstrap';
 import FieldsGenerator from '../../tools/FieldsGenerator.js';
 import AuthActionCreators from '../../actions/AuthActionCreators.js';
 import Cookie from 'js-cookie'
+import UserStore from '../../stores/UserStore.js';
 
 export default React.createClass({
   mixins: [Navigation],
@@ -16,16 +17,16 @@ export default React.createClass({
   submit() {
     var data = this.state.form
 
-    AuthActionCreators.login(data).then(function(result) {
-      this.transitionTo('/')
-    }.bind(this), function() {
-      this.transitionTo('/auth')
-    }.bind(this))
+    AuthActionCreators.login(data).then().then(function(result) {
+      AuthActionCreators.checkAdmin()
+    })
   },
 
   render() {
-    if (Cookie.get('token'))
-      return this.transitionTo('/')
+    if (UserStore.get('user')) {
+      this.transitionTo('/')
+      return <div></div>
+    }
 
     var fields = [
       {
