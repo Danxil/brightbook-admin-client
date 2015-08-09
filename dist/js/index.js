@@ -68189,7 +68189,7 @@ exports['default'] = (function (vow) {
     },
 
     checkAdmin: function checkAdmin() {
-      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/auth/check-admin';
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/myself-admin';
 
       return _jquery2['default'].get(url);
     }
