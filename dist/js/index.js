@@ -69182,6 +69182,11 @@ exports['default'] = _react2['default'].createClass({
       name: 'countReeditions',
       min: 0
     }, {
+      type: 'number',
+      label: 'Enter book weight',
+      name: 'weight',
+      min: 0
+    }, {
       type: 'datepicker',
       label: 'Date first edition',
       name: 'dateFirstEdition'
@@ -70159,6 +70164,11 @@ exports['default'] = _react2['default'].createClass({
       type: 'number',
       label: 'Enter reeditions count',
       name: 'countReeditions',
+      min: 0
+    }, {
+      type: 'number',
+      label: 'Enter book weight',
+      name: 'weight',
       min: 0
     }, {
       type: 'datepicker',

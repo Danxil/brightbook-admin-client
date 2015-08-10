@@ -209,6 +209,12 @@ export default React.createClass({
         min: 0
       },
       {
+        type: 'number',
+        label: 'Enter book weight',
+        name: 'weight',
+        min: 0
+      },
+      {
         type: 'datepicker',
         label: 'Date first edition',
         name: 'dateFirstEdition',
