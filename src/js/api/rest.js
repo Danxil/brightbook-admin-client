@@ -324,6 +324,62 @@ export default (function(vow){
     
 
 
+    getContacts(id) {
+      let def = vow.defer()
+      let url = Constants.ConfigSources.REST_BASE_URL + '/contact'
+      if (id) url += '/' + id
+
+      jq.ajax({
+        url: url,
+        type: 'get',
+        success: function(result) {
+          def.resolve(result)
+        },
+        error: function() {
+          def.reject()
+        }
+      })
+
+      return def.promise()
+    },
+    editContactField(id, field, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/' + field + '/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+    deleteContactField(id, field) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/' + field + '/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete',
+      })
+    },
+    addContactField(field, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/' + field
+
+      return jq.ajax({
+        url: url,
+        type: 'post',
+        data: data
+      })
+    },
+    associateContactAndContactField(id, field, filedId) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/contact/' + id + '/' + field + '/' + filedId
+
+      return jq.ajax({
+        url: url,
+        type: 'post'
+      })
+    },
+    
+    
+
+
     getHeaderColors() {
       let url = Constants.ConfigSources.REST_BASE_URL + '/headercolor'
 

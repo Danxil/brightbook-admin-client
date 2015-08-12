@@ -1,5 +1,5 @@
 import React from 'react';
-import {Input} from 'react-bootstrap';
+import {Input, Button} from 'react-bootstrap';
 import Datepicker from '../components/helpers/Datepicker.jsx';
 import Colorpicker from '../components/helpers/Colorpicker.jsx';
 import UploadImage from '../components/helpers/UploadImage.jsx';
@@ -14,6 +14,14 @@ export default function(obj, fields) {
   function valueChange(fieldName) {
     this.setState(function(prev) {
       prev.form[fieldName] = this.refs[fieldName].getValue()
+
+      return prev
+    })
+  }
+
+  function arrayValueChange(array, index, fieldName) {
+    this.setState(function(prev) {
+      prev.form[array][index][fieldName] = this.refs[array + index + fieldName].getValue()
 
       return prev
     })
@@ -63,14 +71,36 @@ export default function(obj, fields) {
   return fields.map(function(field) {
     switch (field.type) {
       case 'text':
-        return (<Input
-          type={field.type}
-          value={form[field.name]}
-          label={field.label}
-          ref={field.name}
-          onChange={valueChange.bind(this, field.name)}/>)
-        break
+        if (!field.array)
+          return (<Input
+            type={field.type}
+            value={form[field.name]}
+            label={field.label}
+            ref={field.name}
+            onChange={valueChange.bind(this, field.name)}/>)
+        else {
+          var fields = _.map(form[field.array], function(form, index) {
+            return (
+              <div>
+                <Input
+                  type={field.type}
+                  value={form[field.name]}
+                  label={field.label}
+                  ref={field.array + index + field.name}
+                  onChange={arrayValueChange.bind(this, field.array, index, field.name)}/>
+                <Button bsStyle="danger">Delete</Button>
+              </div>
+            )
+          })
 
+          return (
+            <div>
+              {fields}
+              <Button>Add new {field.name}</Button>
+            </div>
+          )
+        }
+        break
       case 'email':
         return (<Input
           type={field.type}
@@ -100,14 +130,16 @@ export default function(obj, fields) {
 
       case 'select':
         if (!field.multiple)
-          return (<Input
-            type={field.type}
-            value={form[field.name] ? form[field.name].id : null}
-            label={field.label}
-            ref={field.name}
-            onChange={selectChange.bind(this, field.name)}>
-            {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
-          </Input>)
+          return (<div>
+            <Input
+              type={field.type}
+              value={form[field.name] ? form[field.name].id : null}
+              label={field.label}
+              ref={field.name}
+              onChange={selectChange.bind(this, field.name)}>
+              {field.options.map((option)=> <option value={option.id}>{option[field.optionLabelField]}</option>)}
+            </Input>
+          </div>)
         else
           return (<Input
             type={field.type}

@@ -66554,7 +66554,20 @@ exports['default'] = {
 
     START_LOAD_USER: null,
     SUCCESS_LOAD_USER: null,
-    ERROR_LOAD_USER: null
+    ERROR_LOAD_USER: null,
+
+    START_LOAD_CONTACTS: null,
+    SUCCESS_LOAD_CONTACTS: null,
+
+    START_ADD_CONTACT: null,
+    SUCCESS_ADD_CONTACT: null,
+
+    START_EDIT_CONTACT: null,
+    SUCCESS_EDIT_CONTACT: null,
+
+    START_DELETE_CONTACT: null,
+    SUCCESS_DELETE_CONTACT: null
+
   }),
 
   ActionSources: (0, _reactLibKeyMirror2['default'])({
@@ -66688,7 +66701,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/AuthorsStore.js":408,"js-cookie":7,"underscore":349,"vow":350}],354:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/AuthorsStore.js":413,"js-cookie":7,"underscore":349,"vow":350}],354:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -66811,7 +66824,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/AuthorsStore.js":408,"underscore":349,"vow":350}],355:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/AuthorsStore.js":413,"underscore":349,"vow":350}],355:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -66973,7 +66986,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/BookReasonsStore.js":410,"underscore":349,"vow":350}],356:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BookReasonsStore.js":415,"underscore":349,"vow":350}],356:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67135,7 +67148,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/BookReviewsStore.js":411,"underscore":349,"vow":350}],357:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BookReviewsStore.js":416,"underscore":349,"vow":350}],357:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67288,7 +67301,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/BooksStore.js":412,"underscore":349,"vow":350}],358:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BooksStore.js":417,"underscore":349,"vow":350}],358:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67403,7 +67416,111 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/CategoriesStore":413,"vow":350}],359:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CategoriesStore":418,"vow":350}],359:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _apiRestJs = require('../api/rest.js');
+
+var _apiRestJs2 = _interopRequireDefault(_apiRestJs);
+
+var _storesContactsStoreJs = require('../stores/ContactsStore.js');
+
+var _storesContactsStoreJs2 = _interopRequireDefault(_storesContactsStoreJs);
+
+var _vow = require('vow');
+
+var _vow2 = _interopRequireDefault(_vow);
+
+var _underscore = require('underscore');
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+exports['default'] = {
+  loadContacts: function loadContacts(id) {
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_LOAD_CONTACTS
+    });
+
+    return _apiRestJs2['default'].getContacts(id).then(function (response) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_LOAD_CONTACTS,
+        contacts: response.data
+      });
+    });
+  },
+
+  addContactField: function addContactField(id, field, data) {
+    var def = _vow2['default'].defer();
+
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_ADD_CONTACT
+    });
+
+    _apiRestJs2['default'].addContactField(field, data).then(function (response) {
+      _apiRestJs2['default'].associateContactAndContactField(id, field, response.data.id).then(function (response) {
+
+        _Dispatcher2['default'].handleServerAction({
+          type: _Constants2['default'].ActionTypes.SUCCESS_ADD_CONTACT,
+          contact: response.data
+        });
+
+        def.resolve();
+      });
+    });
+
+    return def.promise();
+  },
+
+  editContactField: function editContactField(id, field, data) {
+    var def = _vow2['default'].defer();
+
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_EDIT_CONTACT
+    });
+
+    _apiRestJs2['default'].editContactField(id, field, data).then(function (result) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_EDIT_CONTACT,
+        contact: result.data
+      });
+
+      def.resolve();
+    });
+
+    return def.promise();
+  },
+
+  deleteContactField: function deleteContactField(id, field) {
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_DELETE_CONTACT
+    });
+
+    return _apiRestJs2['default'].deleteContactField(id, field).then(function () {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_DELETE_CONTACT,
+        id: id
+      });
+    });
+  }
+};
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/ContactsStore.js":420,"underscore":349,"vow":350}],360:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67507,7 +67624,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/CoverTypesStore.js":415,"underscore":349,"vow":350}],360:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CoverTypesStore.js":421,"underscore":349,"vow":350}],361:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67549,7 +67666,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"vow":350}],361:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"vow":350}],362:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67653,7 +67770,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/FormatsStore.js":417,"underscore":349,"vow":350}],362:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/FormatsStore.js":423,"underscore":349,"vow":350}],363:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67699,7 +67816,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/CategoriesStore":413,"vow":350}],363:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CategoriesStore":418,"vow":350}],364:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67803,7 +67920,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":364,"../stores/RubricsStore.js":419,"underscore":349,"vow":350}],364:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/RubricsStore.js":425,"underscore":349,"vow":350}],365:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68126,6 +68243,59 @@ exports['default'] = (function (vow) {
       });
     },
 
+    getContacts: function getContacts(id) {
+      var def = vow.defer();
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/contact';
+      if (id) url += '/' + id;
+
+      _jquery2['default'].ajax({
+        url: url,
+        type: 'get',
+        success: function success(result) {
+          def.resolve(result);
+        },
+        error: function error() {
+          def.reject();
+        }
+      });
+
+      return def.promise();
+    },
+    editContactField: function editContactField(id, field, data) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/' + field + '/' + id;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'put',
+        data: data
+      });
+    },
+    deleteContactField: function deleteContactField(id, field) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/' + field + '/' + id;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'delete'
+      });
+    },
+    addContactField: function addContactField(field, data) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/' + field;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'post',
+        data: data
+      });
+    },
+    associateContactAndContactField: function associateContactAndContactField(id, field, filedId) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/contact/' + id + '/' + field + '/' + filedId;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'post'
+      });
+    },
+
     getHeaderColors: function getHeaderColors() {
       var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/headercolor';
 
@@ -68199,7 +68369,7 @@ exports['default'] = (function (vow) {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"jquery":6,"vow":350}],365:[function(require,module,exports){
+},{"../Constants":351,"jquery":6,"vow":350}],366:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68302,7 +68472,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../actions/AuthActionCreators.js":353,"../stores/UserStore.js":420,"./NavigationMenu.jsx":366,"react":348,"react-router":132}],366:[function(require,module,exports){
+},{"../actions/AuthActionCreators.js":353,"../stores/UserStore.js":426,"./NavigationMenu.jsx":367,"react":348,"react-router":132}],367:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68388,6 +68558,15 @@ exports['default'] = _react2['default'].createClass({
           { to: '/authors' },
           'Authors'
         )
+      ),
+      _react2['default'].createElement(
+        'p',
+        null,
+        _react2['default'].createElement(
+          _reactRouter.Link,
+          { to: '/contacts' },
+          'Contacts'
+        )
       )
     );
   }
@@ -68395,7 +68574,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-bootstrap":75,"react-router":132}],367:[function(require,module,exports){
+},{"react":348,"react-bootstrap":75,"react-router":132}],368:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68487,7 +68666,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/AuthActionCreators.js":353,"../../stores/UserStore.js":420,"../../tools/FieldsGenerator.js":421,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],368:[function(require,module,exports){
+},{"../../actions/AuthActionCreators.js":353,"../../stores/UserStore.js":426,"../../tools/FieldsGenerator.js":427,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],369:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68598,7 +68777,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],369:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],370:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68633,7 +68812,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],370:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],371:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68704,7 +68883,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"./Author.jsx":369,"react":348}],371:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"./Author.jsx":370,"react":348}],372:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68746,7 +68925,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./Authors.jsx":370,"react":348,"react-router":132}],372:[function(require,module,exports){
+},{"./Authors.jsx":371,"react":348,"react-router":132}],373:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68938,7 +69117,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":408,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],373:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],374:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69259,7 +69438,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":415,"../../stores/FormSideSchemasStore.js":416,"../../stores/FormatsStore.js":417,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],374:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":364,"../../stores/AuthorsStore.js":413,"../../stores/BooksStore.js":417,"../../stores/CategoriesStore":418,"../../stores/CoverTypesStore.js":421,"../../stores/FormSideSchemasStore.js":422,"../../stores/FormatsStore.js":423,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],375:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69294,7 +69473,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],375:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],376:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69412,7 +69591,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],376:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],377:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69535,7 +69714,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/BookReasonsActionCreators.js":355,"../../stores/BookReasonsStore.js":410,"./BookReason.jsx":375,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],377:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/BookReasonsActionCreators.js":355,"../../stores/BookReasonsStore.js":415,"./BookReason.jsx":376,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],378:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69653,7 +69832,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],378:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],379:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69777,7 +69956,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/BookReviewsActionCreators.js":356,"../../stores/BookReviewsStore.js":411,"./BookReview.jsx":377,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],379:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/BookReviewsActionCreators.js":356,"../../stores/BookReviewsStore.js":416,"./BookReview.jsx":378,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],380:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69819,7 +69998,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./BooksList.jsx":380,"react":348,"react-router":132}],380:[function(require,module,exports){
+},{"./BooksList.jsx":381,"react":348,"react-router":132}],381:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69888,7 +70067,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/BooksActionCreators.js":357,"../../stores/BooksStore.js":412,"./Book.jsx":374,"react":348}],381:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/BooksActionCreators.js":357,"../../stores/BooksStore.js":417,"./Book.jsx":375,"react":348}],382:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70309,7 +70488,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":359,"../../actions/FormSideSchemasActionCreator.js":360,"../../actions/FormatsActionCreators.js":361,"../../actions/RubricsActionCreators.js":363,"../../stores/AuthorsStore.js":408,"../../stores/BooksStore.js":412,"../../stores/CategoriesStore":413,"../../stores/CoverTypesStore.js":415,"../../stores/FormSideSchemasStore.js":416,"../../stores/FormatsStore.js":417,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],382:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":364,"../../stores/AuthorsStore.js":413,"../../stores/BooksStore.js":417,"../../stores/CategoriesStore":418,"../../stores/CoverTypesStore.js":421,"../../stores/FormSideSchemasStore.js":422,"../../stores/FormatsStore.js":423,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],383:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70462,7 +70641,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/HeaderColorsStore":418,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],383:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/HeaderColorsStore":424,"./../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],384:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70504,7 +70683,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./CategoriesList.jsx":384,"react":348,"react-router":132}],384:[function(require,module,exports){
+},{"./CategoriesList.jsx":385,"react":348,"react-router":132}],385:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70573,7 +70752,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CategoriesActionCreators.js":358,"../../stores/CategoriesStore":413,"./Category.jsx":385,"react":348}],385:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CategoriesActionCreators.js":358,"../../stores/CategoriesStore":418,"./Category.jsx":386,"react":348}],386:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70608,7 +70787,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],386:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],387:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70832,7 +71011,283 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":362,"../../stores/CategoriesStore":413,"../../stores/HeaderColorsStore":418,"./../helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-router":132}],387:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/CategoriesStore":418,"../../stores/HeaderColorsStore":424,"./../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],388:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+require('../../../../node_modules/react/addons');
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'Contact',
+
+  render: function render() {
+    var contact = this.props.contact;
+
+    return _react2['default'].createElement(
+      _reactRouter.Link,
+      { to: 'edit-contact', params: { id: contact.id }, className: 'list-group-item' },
+      contact.name
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],389:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
+
+var _ContactsListJsx = require('./ContactsList.jsx');
+
+var _ContactsListJsx2 = _interopRequireDefault(_ContactsListJsx);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'ContactsContainer',
+
+  render: function render() {
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'p',
+        { className: 'text-right' },
+        _react2['default'].createElement(
+          _reactRouter.Link,
+          { className: 'btn btn-primary', to: '/add-format' },
+          'Add format'
+        )
+      ),
+      _react2['default'].createElement(_ContactsListJsx2['default'], null)
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"./ContactsList.jsx":390,"react":348,"react-router":132}],390:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _ContactJsx = require('./Contact.jsx');
+
+var _ContactJsx2 = _interopRequireDefault(_ContactJsx);
+
+var _node_modulesReactBootstrapLibListGroup = require('../../../../node_modules/react-bootstrap/lib/ListGroup');
+
+var _node_modulesReactBootstrapLibListGroup2 = _interopRequireDefault(_node_modulesReactBootstrapLibListGroup);
+
+var _actionsContactsActionCreatorsJs = require('../../actions/ContactsActionCreators.js');
+
+var _actionsContactsActionCreatorsJs2 = _interopRequireDefault(_actionsContactsActionCreatorsJs);
+
+var _storesContactsStoreJs = require('../../stores/ContactsStore.js');
+
+var _storesContactsStoreJs2 = _interopRequireDefault(_storesContactsStoreJs);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'ContactsList',
+
+  getInitialState: function getInitialState() {
+    _actionsContactsActionCreatorsJs2['default'].loadContacts();
+
+    return { contacts: _storesContactsStoreJs2['default'].getAll() };
+  },
+
+  createContactsDom: function createContactsDom(contacts) {
+    return contacts.map(function (contact) {
+      return _react2['default'].createElement(_ContactJsx2['default'], { contact: contact });
+    });
+  },
+
+  _onChange: function _onChange() {
+    this.setState({ contacts: _storesContactsStoreJs2['default'].getAll() });
+  },
+
+  componentDidMount: function componentDidMount() {
+    _storesContactsStoreJs2['default'].addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    _storesContactsStoreJs2['default'].removeChangeListener(this._onChange);
+  },
+
+  render: function render() {
+    var contacts = this.state.contacts;
+
+    return _react2['default'].createElement(
+      _node_modulesReactBootstrapLibListGroup2['default'],
+      null,
+      this.createContactsDom(contacts)
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":420,"./Contact.jsx":388,"react":348}],391:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _actionsContactsActionCreatorsJs = require('../../actions/ContactsActionCreators.js');
+
+var _actionsContactsActionCreatorsJs2 = _interopRequireDefault(_actionsContactsActionCreatorsJs);
+
+var _storesContactsStoreJs = require('../../stores/ContactsStore.js');
+
+var _storesContactsStoreJs2 = _interopRequireDefault(_storesContactsStoreJs);
+
+var _ConstantsJs = require('../../Constants.js');
+
+var _ConstantsJs2 = _interopRequireDefault(_ConstantsJs);
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
+
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'EditContact',
+
+  mixins: [_reactRouter.Navigation],
+
+  getInitialState: function getInitialState() {
+    var obj = {};
+
+    var contactId = this.props.params.id;
+
+    _actionsContactsActionCreatorsJs2['default'].loadContacts(contactId);
+
+    obj.deleteFields = {
+      emails: [],
+      phones: [],
+      postAddress: []
+    };
+
+    obj.newFields = {
+      emails: [],
+      phones: [],
+      postAddress: []
+    };
+
+    return obj;
+  },
+
+  _onChange: function _onChange() {
+    this.setState(function (prev) {
+      var contact = _storesContactsStoreJs2['default'].getOne(this.props.params.id);
+
+      prev.form = contact;
+
+      return prev;
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+    _storesContactsStoreJs2['default'].addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    _storesContactsStoreJs2['default'].removeChangeListener(this._onChange);
+  },
+
+  submit: function submit() {
+    _actionsContactsActionCreatorsJs2['default'].editContact(this.props.params.id, this.state.form).then((function () {
+      this.transitionTo('contacts');
+    }).bind(this));
+  },
+
+  render: function render() {
+    var _state = this.state;
+    var form = _state.form;
+    var deleteFields = _state.deleteFields;
+    var newFields = _state.newFields;
+
+    if (!form) return _react2['default'].createElement('div', null);
+
+    var fields = [{
+      type: 'text',
+      label: 'Emails',
+      name: 'email',
+      array: 'emails',
+      newArray: newFields,
+      deleteArray: deleteFields
+    }];
+
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'div',
+        { className: 'form-group clearfix' },
+        _react2['default'].createElement(
+          'h2',
+          null,
+          form.name
+        )
+      ),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
+      _react2['default'].createElement('hr', null),
+      _react2['default'].createElement(
+        _reactBootstrap.ButtonToolbar,
+        { className: 'pull-left' },
+        _react2['default'].createElement(
+          _reactBootstrap.Button,
+          { bsStyle: 'primary', onClick: this.submit },
+          'Edit contact'
+        )
+      )
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../Constants.js":351,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":420,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],392:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70941,7 +71396,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"react":348,"react-bootstrap":75,"react-router":132}],388:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"react":348,"react-bootstrap":75,"react-router":132}],393:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70976,7 +71431,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],389:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71018,7 +71473,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./CoverTypesList.jsx":390,"react":348,"react-router":132}],390:[function(require,module,exports){
+},{"./CoverTypesList.jsx":395,"react":348,"react-router":132}],395:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71087,7 +71542,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"./CoverType.jsx":388,"react":348}],391:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"./CoverType.jsx":393,"react":348}],396:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71273,7 +71728,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":359,"../../stores/CoverTypesStore.js":415,"react":348,"react-bootstrap":75,"react-router":132}],392:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"react":348,"react-bootstrap":75,"react-router":132}],397:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71357,7 +71812,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],393:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],398:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71524,7 +71979,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":417,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":423,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],399:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71559,7 +72014,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],395:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],400:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71601,7 +72056,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./FormatsList.jsx":396,"react":348,"react-router":132}],396:[function(require,module,exports){
+},{"./FormatsList.jsx":401,"react":348,"react-router":132}],401:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71670,7 +72125,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":361,"../../stores/FormatsStore.js":417,"./Format.jsx":394,"react":348}],397:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":423,"./Format.jsx":399,"react":348}],402:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71707,7 +72162,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-bootstrap":75}],398:[function(require,module,exports){
+},{"react":348,"react-bootstrap":75}],403:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71764,7 +72219,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-colorpicker":99}],399:[function(require,module,exports){
+},{"react":348,"react-colorpicker":99}],404:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71810,7 +72265,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-datepicker":104}],400:[function(require,module,exports){
+},{"react":348,"react-datepicker":104}],405:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71914,7 +72369,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],401:[function(require,module,exports){
+},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],406:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72020,7 +72475,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],402:[function(require,module,exports){
+},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],407:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72122,7 +72577,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],403:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],408:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72303,7 +72758,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"../../tools/FieldsGenerator.js":421,"react":348,"react-bootstrap":75,"react-router":132}],404:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],409:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72338,7 +72793,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],405:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],410:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72407,7 +72862,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":363,"../../stores/RubricsStore.js":419,"./Rubric.jsx":404,"react":348}],406:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"./Rubric.jsx":409,"react":348}],411:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72449,7 +72904,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./Rubrics.jsx":405,"react":348,"react-router":132}],407:[function(require,module,exports){
+},{"./Rubrics.jsx":410,"react":348,"react-router":132}],412:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -72542,6 +72997,14 @@ var _componentsFormatsAddFormatJsx = require('./components/formats/AddFormat.jsx
 
 var _componentsFormatsAddFormatJsx2 = _interopRequireDefault(_componentsFormatsAddFormatJsx);
 
+var _componentsContactsContactsContainerJsx = require('./components/contacts/ContactsContainer.jsx');
+
+var _componentsContactsContactsContainerJsx2 = _interopRequireDefault(_componentsContactsContactsContainerJsx);
+
+var _componentsContactsEditContactJsx = require('./components/contacts/EditContact.jsx');
+
+var _componentsContactsEditContactJsx2 = _interopRequireDefault(_componentsContactsEditContactJsx);
+
 var _componentsAuthAuthJsx = require('./components/auth/Auth.jsx');
 
 var _componentsAuthAuthJsx2 = _interopRequireDefault(_componentsAuthAuthJsx);
@@ -72592,7 +73055,9 @@ var routes = _react2['default'].createElement(
     _react2['default'].createElement(_reactRouter.Route, { name: 'add-cover-type', path: '/add-cover-type', handler: _componentsCoverTypesAddCoverTypeJsx2['default'] }),
     _react2['default'].createElement(_reactRouter.Route, { name: 'formats', path: '/formats', handler: _componentsFormatsFormatsContainerJsx2['default'] }),
     _react2['default'].createElement(_reactRouter.Route, { name: 'edit-format', path: '/edit-format/:id', handler: _componentsFormatsEditFormatJsx2['default'] }),
-    _react2['default'].createElement(_reactRouter.Route, { name: 'add-format', path: '/add-format', handler: _componentsFormatsAddFormatJsx2['default'] })
+    _react2['default'].createElement(_reactRouter.Route, { name: 'add-format', path: '/add-format', handler: _componentsFormatsAddFormatJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'contacts', path: '/contacts', handler: _componentsContactsContactsContainerJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'edit-contact', path: '/edit-contact/:id', handler: _componentsContactsEditContactJsx2['default'] })
 );
 
 (0, _reactRouter.run)(routes, _reactRouter.HashLocation, function (Root) {
@@ -72600,7 +73065,7 @@ var routes = _react2['default'].createElement(
 });
 
 
-},{"./components/AppContainer.jsx":365,"./components/auth/Auth.jsx":367,"./components/authors/AddAuthor.jsx":368,"./components/authors/AuthorsContainer.jsx":371,"./components/authors/EditAuthor.jsx":372,"./components/books/AddBook.jsx":373,"./components/books/BookReasons.jsx":376,"./components/books/BookReviews.jsx":378,"./components/books/BooksContainer.jsx":379,"./components/books/EditBook.jsx":381,"./components/categories/AddCategory.jsx":382,"./components/categories/CategoriesContainer.jsx":383,"./components/categories/EditCategory.jsx":386,"./components/cover-types/AddCoverType.jsx":387,"./components/cover-types/CoverTypesContainer.jsx":389,"./components/cover-types/EditCoverType.jsx":391,"./components/formats/AddFormat.jsx":392,"./components/formats/EditFormat.jsx":393,"./components/formats/FormatsContainer.jsx":395,"./components/hello/Hello.jsx":397,"./components/rubrics/AddRubric.jsx":402,"./components/rubrics/EditRubric.jsx":403,"./components/rubrics/RubricsContainer.jsx":406,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],408:[function(require,module,exports){
+},{"./components/AppContainer.jsx":366,"./components/auth/Auth.jsx":368,"./components/authors/AddAuthor.jsx":369,"./components/authors/AuthorsContainer.jsx":372,"./components/authors/EditAuthor.jsx":373,"./components/books/AddBook.jsx":374,"./components/books/BookReasons.jsx":377,"./components/books/BookReviews.jsx":379,"./components/books/BooksContainer.jsx":380,"./components/books/EditBook.jsx":382,"./components/categories/AddCategory.jsx":383,"./components/categories/CategoriesContainer.jsx":384,"./components/categories/EditCategory.jsx":387,"./components/contacts/ContactsContainer.jsx":389,"./components/contacts/EditContact.jsx":391,"./components/cover-types/AddCoverType.jsx":392,"./components/cover-types/CoverTypesContainer.jsx":394,"./components/cover-types/EditCoverType.jsx":396,"./components/formats/AddFormat.jsx":397,"./components/formats/EditFormat.jsx":398,"./components/formats/FormatsContainer.jsx":400,"./components/hello/Hello.jsx":402,"./components/rubrics/AddRubric.jsx":407,"./components/rubrics/EditRubric.jsx":408,"./components/rubrics/RubricsContainer.jsx":411,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],413:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72680,7 +73145,7 @@ exports['default'] = AuthorStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],409:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],414:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72744,7 +73209,7 @@ exports['default'] = (0, _objectAssign2['default'])({}, _events.EventEmitter.pro
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"events":1,"object-assign":9,"underscore":349}],410:[function(require,module,exports){
+},{"../Constants":351,"events":1,"object-assign":9,"underscore":349}],415:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72825,7 +73290,7 @@ exports['default'] = BookReasonsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],411:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],416:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72906,7 +73371,7 @@ exports['default'] = BookReviewsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],412:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],417:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72986,7 +73451,7 @@ exports['default'] = BooksStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],413:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],418:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73066,7 +73531,7 @@ exports['default'] = CategoriesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],414:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],419:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73142,7 +73607,87 @@ exports['default'] = (0, _objectAssign2['default'])({}, _BaseStore2['default'], 
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"./BaseStore":409,"events":1,"object-assign":9,"underscore":349}],415:[function(require,module,exports){
+},{"../Constants":351,"./BaseStore":414,"events":1,"object-assign":9,"underscore":349}],420:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _CollectionStore = require('./CollectionStore');
+
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var ContactsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
+  _id: 'id',
+
+  dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
+    var action = payload.action;
+
+    switch (action.type) {
+      case _Constants2['default'].ActionTypes.START_LOAD_CONTACTS:
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_LOAD_CONTACTS:
+        ContactsStore.addItems(action.contacts);
+
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_ADD_CONTACT:
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_ADD_CONTACT:
+        ContactsStore.addItems(action.contacts);
+
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_EDIT_CONTACT:
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_EDIT_CONTACT:
+        ContactsStore.editItem(action.contacts);
+
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_DELETE_CONTACT:
+        ContactsStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_DELETE_CONTACT:
+        ContactsStore.deleteItem(action.id);
+
+        ContactsStore.emitChange();
+
+        break;
+    }
+  })
+});
+
+exports['default'] = ContactsStore;
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],421:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73222,7 +73767,7 @@ exports['default'] = CoverTypesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],416:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],422:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73272,7 +73817,7 @@ exports['default'] = FormSideSchemasStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],417:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],423:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73352,7 +73897,7 @@ exports['default'] = FormatsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],418:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],424:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73402,7 +73947,7 @@ exports['default'] = HeaderColorsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],419:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],425:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73482,7 +74027,7 @@ exports['default'] = RubricsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":414,"object-assign":9}],420:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],426:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73537,7 +74082,7 @@ exports['default'] = UserStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":409,"object-assign":9}],421:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./BaseStore":414,"object-assign":9}],427:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73593,6 +74138,14 @@ exports['default'] = function (obj, fields) {
     });
   }
 
+  function arrayValueChange(array, index, fieldName) {
+    this.setState(function (prev) {
+      prev.form[array][index][fieldName] = this.refs[array + index + fieldName].getValue();
+
+      return prev;
+    });
+  }
+
   function multipleSelectChange(fieldName) {
     this.setState(function (prev) {
       prev.selects[fieldName] = this.refs[fieldName].getValue();
@@ -73636,14 +74189,43 @@ exports['default'] = function (obj, fields) {
   return fields.map((function (field) {
     switch (field.type) {
       case 'text':
-        return _react2['default'].createElement(_reactBootstrap.Input, {
+        if (!field.array) return _react2['default'].createElement(_reactBootstrap.Input, {
           type: field.type,
           value: form[field.name],
           label: field.label,
           ref: field.name,
-          onChange: valueChange.bind(this, field.name) });
-        break;
+          onChange: valueChange.bind(this, field.name) });else {
+          var fields = _underscore2['default'].map(form[field.array], function (form, index) {
+            return _react2['default'].createElement(
+              'div',
+              null,
+              _react2['default'].createElement(_reactBootstrap.Input, {
+                type: field.type,
+                value: form[field.name],
+                label: field.label,
+                ref: field.array + index + field.name,
+                onChange: arrayValueChange.bind(this, field.array, index, field.name) }),
+              _react2['default'].createElement(
+                _reactBootstrap.Button,
+                { bsStyle: 'danger' },
+                'Delete'
+              )
+            );
+          });
 
+          return _react2['default'].createElement(
+            'div',
+            null,
+            fields,
+            _react2['default'].createElement(
+              _reactBootstrap.Button,
+              null,
+              'Add new ',
+              field.name
+            )
+          );
+        }
+        break;
       case 'email':
         return _react2['default'].createElement(_reactBootstrap.Input, {
           type: field.type,
@@ -73673,20 +74255,24 @@ exports['default'] = function (obj, fields) {
 
       case 'select':
         if (!field.multiple) return _react2['default'].createElement(
-          _reactBootstrap.Input,
-          {
-            type: field.type,
-            value: form[field.name] ? form[field.name].id : null,
-            label: field.label,
-            ref: field.name,
-            onChange: selectChange.bind(this, field.name) },
-          field.options.map(function (option) {
-            return _react2['default'].createElement(
-              'option',
-              { value: option.id },
-              option[field.optionLabelField]
-            );
-          })
+          'div',
+          null,
+          _react2['default'].createElement(
+            _reactBootstrap.Input,
+            {
+              type: field.type,
+              value: form[field.name] ? form[field.name].id : null,
+              label: field.label,
+              ref: field.name,
+              onChange: selectChange.bind(this, field.name) },
+            field.options.map(function (option) {
+              return _react2['default'].createElement(
+                'option',
+                { value: option.id },
+                option[field.optionLabelField]
+              );
+            })
+          )
         );else return _react2['default'].createElement(
           _reactBootstrap.Input,
           {
@@ -73757,4 +74343,4 @@ exports['default'] = function (obj, fields) {
 module.exports = exports['default'];
 
 
-},{"../Constants.js":351,"../components/helpers/Colorpicker.jsx":398,"../components/helpers/Datepicker.jsx":399,"../components/helpers/UploadFile.jsx":400,"../components/helpers/UploadImage.jsx":401,"react":348,"react-bootstrap":75,"react-tinymce":150,"underscore":349}]},{},[407]);
+},{"../Constants.js":351,"../components/helpers/Colorpicker.jsx":403,"../components/helpers/Datepicker.jsx":404,"../components/helpers/UploadFile.jsx":405,"../components/helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-tinymce":150,"underscore":349}]},{},[412]);

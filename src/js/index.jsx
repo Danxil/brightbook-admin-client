@@ -30,6 +30,9 @@ import FormatsContainer from './components/formats/FormatsContainer.jsx';
 import EditFormat from './components/formats/EditFormat.jsx';
 import AddFormat from './components/formats/AddFormat.jsx';
 
+import ContactsContainer from './components/contacts/ContactsContainer.jsx';
+import EditContact from './components/contacts/EditContact.jsx';
+
 import Auth from './components/auth/Auth.jsx';
 import Hello from './components/hello/Hello.jsx';
 
@@ -76,6 +79,9 @@ let routes = (
         <Route name="formats" path="/formats" handler={FormatsContainer} />
         <Route name="edit-format" path="/edit-format/:id" handler={EditFormat} />
         <Route name="add-format" path="/add-format" handler={AddFormat} />
+
+        <Route name="contacts" path="/contacts" handler={ContactsContainer} />
+        <Route name="edit-contact" path="/edit-contact/:id" handler={EditContact} />
     </Route>
 )
 

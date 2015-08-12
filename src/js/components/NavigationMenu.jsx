@@ -27,6 +27,9 @@ export default React.createClass({
         <p>
           <Link to="/authors">Authors</Link>
         </p>
+        <p>
+          <Link to="/contacts">Contacts</Link>
+        </p>
       </div>
     );
   }

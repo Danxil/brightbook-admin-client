@@ -147,6 +147,22 @@ export default {
     START_LOAD_USER: null,
     SUCCESS_LOAD_USER: null,
     ERROR_LOAD_USER: null,
+
+
+
+
+    START_LOAD_CONTACTS: null,
+    SUCCESS_LOAD_CONTACTS: null,
+
+    START_ADD_CONTACT: null,
+    SUCCESS_ADD_CONTACT: null,
+
+    START_EDIT_CONTACT: null,
+    SUCCESS_EDIT_CONTACT: null,
+
+    START_DELETE_CONTACT: null,
+    SUCCESS_DELETE_CONTACT: null,
+
   }),
 
   ActionSources: keyMirror({
