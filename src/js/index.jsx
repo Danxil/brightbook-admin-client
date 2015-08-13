@@ -33,6 +33,13 @@ import AddFormat from './components/formats/AddFormat.jsx';
 import ContactsContainer from './components/contacts/ContactsContainer.jsx';
 import EditContact from './components/contacts/EditContact.jsx';
 
+import EditMerchant from './components/merchant/EditMerchant.jsx';
+
+import SlidersContainer from './components/sliders/SlidersContainer.jsx';
+import AddSlider from './components/sliders/AddSlider.jsx';
+import EditSlider from './components/sliders/EditSlider.jsx';
+
+
 import Auth from './components/auth/Auth.jsx';
 import Hello from './components/hello/Hello.jsx';
 
@@ -80,8 +87,14 @@ let routes = (
         <Route name="edit-format" path="/edit-format/:id" handler={EditFormat} />
         <Route name="add-format" path="/add-format" handler={AddFormat} />
 
+        <Route name="sliders" path="/sliders" handler={SlidersContainer} />
+        <Route name="edit-slider" path="/edit-slider/:id" handler={EditSlider} />
+        <Route name="add-slider" path="/add-slider" handler={AddSlider} />
+        
         <Route name="contacts" path="/contacts" handler={ContactsContainer} />
         <Route name="edit-contact" path="/edit-contact/:id" handler={EditContact} />
+
+        <Route name="merchants" path="/merchant" handler={EditMerchant} />
     </Route>
 )
 

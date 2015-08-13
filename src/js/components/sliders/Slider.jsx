@@ -5,11 +5,11 @@ import {Link} from 'react-router';
 
 export default React.createClass({
   render() {
-    let {format} = this.props;
+    let {slider} = this.props;
 
     return (
-    <Link to="edit-format" params={{id: format.id}} className="list-group-item">
-      {format.name}
+    <Link to="edit-slider" params={{id: slider.id}} className="list-group-item">
+      {slider.title}
     </Link>
     );
   }

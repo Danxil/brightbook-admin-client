@@ -6,8 +6,6 @@ import _ from 'underscore';
 export default assign({}, EventEmitter.prototype, {
   // Allow Controller-View to register itself with store
 
-  _model: {},
-
   addChangeListener(callback) {
     this.on(Constants.CHANGE_EVENT, callback);
   },

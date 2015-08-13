@@ -16,18 +16,6 @@ export default React.createClass({
 
     ContactsActionCreators.loadContacts(contactId)
 
-    obj.deleteFields = {
-      emails: [],
-      phones: [],
-      postAddress: [],
-    }
-
-    obj.newFields = {
-      emails: [],
-      phones: [],
-      postAddress: [],
-    }
-
     return obj
   },
 
@@ -56,20 +44,30 @@ export default React.createClass({
   },
 
   render() {
-    let {form, deleteFields, newFields} = this.state
+    let {form} = this.state
 
     if (!form)
       return(<div></div>)
 
     var fields = [
       {
-        type: 'text',
+        type: 'email',
         label: 'Emails',
-        name: 'email',
+        name: 'name',
         array: 'emails',
-        newArray: newFields,
-        deleteArray: deleteFields,
-      }
+      },
+      {
+        type: 'tel',
+        label: 'Phones',
+        name: 'name',
+        array: 'phones',
+      },
+      {
+        type: 'text',
+        label: 'Post addresses',
+        name: 'name',
+        array: 'postAddresses',
+      },
     ]
 
     return (

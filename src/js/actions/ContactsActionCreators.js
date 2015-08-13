@@ -19,57 +19,42 @@ export default {
     })
   },
 
-  addContactField(id, field, data) {
-    var def = vow.defer()
 
-    Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_ADD_CONTACT
-    })
-
-    rest.addContactField(field, data).then(function(response) {
-      rest.associateContactAndContactField(id, field, response.data.id).then(function(response) {
-
-        Dispatcher.handleServerAction({
-          type: Constants.ActionTypes.SUCCESS_ADD_CONTACT,
-          contact: response.data
-        });
-
-        def.resolve()
-      })
-    })
-
-    return def.promise()
-  },
-
-  editContactField(id, field, data) {
+  editContact(id, data) {
     var def = vow.defer()
 
     Dispatcher.handleServerAction({
       type: Constants.ActionTypes.START_EDIT_CONTACT
     })
 
-    rest.editContactField(id, field, data).then(function(result) {
-      Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_EDIT_CONTACT,
-        contact: result.data
-      });
+    var fields = {
+      emails: 'email',
+      phones: 'phone',
+      postAddresses: 'postAddress',
+    }
 
+    var deffArr = []
+
+    _.each(fields, function(model, field) {
+      data[field].forEach(function(item) {
+        if (item.delete)
+          deffArr.push(rest.deleteContactField(item.id, model))
+        else if (!item.id) {
+          var promise = rest.addContactField(model, item).then(function(result) {
+            return rest.associateContactAndContactField(id, field, result.data.id)
+          })
+
+          deffArr.push(promise)
+        }
+        else
+          rest.editContactField(item.id, model, item)
+      })
+    })
+
+    vow.all(deffArr).then(function(response) {
       def.resolve()
     })
 
     return def.promise()
-  },
-
-  deleteContactField(id, field) {
-    Dispatcher.handleServerAction({
-      type: Constants.ActionTypes.START_DELETE_CONTACT
-    })
-
-    return rest.deleteContactField(id, field).then(function() {
-      Dispatcher.handleServerAction({
-        type: Constants.ActionTypes.SUCCESS_DELETE_CONTACT,
-        id: id
-      });
-    })
   },
 };

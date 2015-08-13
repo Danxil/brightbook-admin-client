@@ -30,6 +30,12 @@ export default React.createClass({
         <p>
           <Link to="/contacts">Contacts</Link>
         </p>
+        <p>
+          <Link to="/merchant">Merchant</Link>
+        </p>
+        <p>
+          <Link to="/sliders">Sliders</Link>
+        </p>
       </div>
     );
   }

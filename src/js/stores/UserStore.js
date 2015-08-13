@@ -5,6 +5,7 @@ import assign from 'object-assign';
 
 const UserStore = assign({}, BaseStore, {
   _id: 'id',
+  _model: {},
 
   dispatcherIndex: Dispatcher.register(function(payload) {
     let action = payload.action;

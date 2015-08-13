@@ -1,15 +1,15 @@
 import React from 'react';
 import {Link} from 'react-router';
-import FormatsList from './FormatsList.jsx';
+import SlidersList from './SlidersList.jsx';
 
 export default React.createClass({
   render() {
     return (
       <div>
         <p className="text-right">
-          <Link className="btn btn-primary" to="/add-format">Add format</Link>
+          <Link className="btn btn-primary" to="/add-slider">Add slider</Link>
         </p>
-        <FormatsList />
+        <SlidersList />
       </div>
     );
   }

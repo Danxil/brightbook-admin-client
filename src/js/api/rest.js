@@ -454,5 +454,70 @@ export default (function(vow){
 
       return jq.get(url)
     },
+
+
+    getMerchant() {
+      let def = vow.defer()
+      let url = Constants.ConfigSources.REST_BASE_URL + '/merchant/1'
+
+      jq.ajax({
+        url: url,
+        type: 'get',
+        success: function(result) {
+          def.resolve(result)
+        },
+        error: function() {
+          def.reject()
+        }
+      })
+
+      return def.promise()
+    },
+    editMerchant(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/merchant/1'
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+
+
+
+
+
+    getSliders(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/slider'
+      if (id) url += '/' + id
+
+      return jq.get(url)
+    },
+    addSlider(data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/slider'
+
+      return jq.ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      })
+    },
+    editSlider(id, data) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/slider/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'put',
+        data: data
+      })
+    },
+    deleteSlider(id) {
+      let url = Constants.ConfigSources.REST_BASE_URL + '/slider/' + id
+
+      return jq.ajax({
+        url: url,
+        type: 'delete'
+      })
+    },
   }
 })(vow)

@@ -66566,8 +66566,31 @@ exports['default'] = {
     SUCCESS_EDIT_CONTACT: null,
 
     START_DELETE_CONTACT: null,
-    SUCCESS_DELETE_CONTACT: null
+    SUCCESS_DELETE_CONTACT: null,
 
+    START_LOAD_MERCHANT: null,
+    SUCCESS_LOAD_MERCHANT: null,
+
+    START_ADD_MERCHANT: null,
+    SUCCESS_ADD_MERCHANT: null,
+
+    START_EDIT_MERCHANT: null,
+    SUCCESS_EDIT_MERCHANT: null,
+
+    START_DELETE_MERCHANT: null,
+    SUCCESS_DELETE_MERCHANT: null,
+
+    START_LOAD_SLIDERS: null,
+    SUCCESS_LOAD_SLIDERS: null,
+
+    START_ADD_SLIDER: null,
+    SUCCESS_ADD_SLIDER: null,
+
+    START_EDIT_SLIDER: null,
+    SUCCESS_EDIT_SLIDER: null,
+
+    START_DELETE_SLIDER: null,
+    SUCCESS_DELETE_SLIDER: null
   }),
 
   ActionSources: (0, _reactLibKeyMirror2['default'])({
@@ -66701,7 +66724,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/AuthorsStore.js":413,"js-cookie":7,"underscore":349,"vow":350}],354:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/AuthorsStore.js":421,"js-cookie":7,"underscore":349,"vow":350}],354:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -66824,7 +66847,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/AuthorsStore.js":413,"underscore":349,"vow":350}],355:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/AuthorsStore.js":421,"underscore":349,"vow":350}],355:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -66986,7 +67009,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BookReasonsStore.js":415,"underscore":349,"vow":350}],356:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/BookReasonsStore.js":423,"underscore":349,"vow":350}],356:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67148,7 +67171,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BookReviewsStore.js":416,"underscore":349,"vow":350}],357:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/BookReviewsStore.js":424,"underscore":349,"vow":350}],357:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67301,7 +67324,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/BooksStore.js":417,"underscore":349,"vow":350}],358:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/BooksStore.js":425,"underscore":349,"vow":350}],358:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67416,7 +67439,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CategoriesStore":418,"vow":350}],359:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/CategoriesStore":426,"vow":350}],359:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67463,64 +67486,44 @@ exports['default'] = {
     });
   },
 
-  addContactField: function addContactField(id, field, data) {
-    var def = _vow2['default'].defer();
-
-    _Dispatcher2['default'].handleServerAction({
-      type: _Constants2['default'].ActionTypes.START_ADD_CONTACT
-    });
-
-    _apiRestJs2['default'].addContactField(field, data).then(function (response) {
-      _apiRestJs2['default'].associateContactAndContactField(id, field, response.data.id).then(function (response) {
-
-        _Dispatcher2['default'].handleServerAction({
-          type: _Constants2['default'].ActionTypes.SUCCESS_ADD_CONTACT,
-          contact: response.data
-        });
-
-        def.resolve();
-      });
-    });
-
-    return def.promise();
-  },
-
-  editContactField: function editContactField(id, field, data) {
+  editContact: function editContact(id, data) {
     var def = _vow2['default'].defer();
 
     _Dispatcher2['default'].handleServerAction({
       type: _Constants2['default'].ActionTypes.START_EDIT_CONTACT
     });
 
-    _apiRestJs2['default'].editContactField(id, field, data).then(function (result) {
-      _Dispatcher2['default'].handleServerAction({
-        type: _Constants2['default'].ActionTypes.SUCCESS_EDIT_CONTACT,
-        contact: result.data
-      });
+    var fields = {
+      emails: 'email',
+      phones: 'phone',
+      postAddresses: 'postAddress'
+    };
 
+    var deffArr = [];
+
+    _underscore2['default'].each(fields, function (model, field) {
+      data[field].forEach(function (item) {
+        if (item['delete']) deffArr.push(_apiRestJs2['default'].deleteContactField(item.id, model));else if (!item.id) {
+          var promise = _apiRestJs2['default'].addContactField(model, item).then(function (result) {
+            return _apiRestJs2['default'].associateContactAndContactField(id, field, result.data.id);
+          });
+
+          deffArr.push(promise);
+        } else _apiRestJs2['default'].editContactField(item.id, model, item);
+      });
+    });
+
+    _vow2['default'].all(deffArr).then(function (response) {
       def.resolve();
     });
 
     return def.promise();
-  },
-
-  deleteContactField: function deleteContactField(id, field) {
-    _Dispatcher2['default'].handleServerAction({
-      type: _Constants2['default'].ActionTypes.START_DELETE_CONTACT
-    });
-
-    return _apiRestJs2['default'].deleteContactField(id, field).then(function () {
-      _Dispatcher2['default'].handleServerAction({
-        type: _Constants2['default'].ActionTypes.SUCCESS_DELETE_CONTACT,
-        id: id
-      });
-    });
   }
 };
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/ContactsStore.js":420,"underscore":349,"vow":350}],360:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/ContactsStore.js":428,"underscore":349,"vow":350}],360:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67624,7 +67627,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CoverTypesStore.js":421,"underscore":349,"vow":350}],361:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/CoverTypesStore.js":429,"underscore":349,"vow":350}],361:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67666,7 +67669,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"vow":350}],362:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"vow":350}],362:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67770,7 +67773,7 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/FormatsStore.js":423,"underscore":349,"vow":350}],363:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/FormatsStore.js":431,"underscore":349,"vow":350}],363:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67816,7 +67819,76 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/CategoriesStore":418,"vow":350}],364:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/CategoriesStore":426,"vow":350}],364:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _apiRestJs = require('../api/rest.js');
+
+var _apiRestJs2 = _interopRequireDefault(_apiRestJs);
+
+var _storesMerchantStoreJs = require('../stores/MerchantStore.js');
+
+var _storesMerchantStoreJs2 = _interopRequireDefault(_storesMerchantStoreJs);
+
+var _vow = require('vow');
+
+var _vow2 = _interopRequireDefault(_vow);
+
+var _underscore = require('underscore');
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+exports['default'] = {
+  loadMerchant: function loadMerchant() {
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_LOAD_MERCHANT
+    });
+
+    return _apiRestJs2['default'].getMerchant().then(function (response) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_LOAD_MERCHANT,
+        merchant: response.data
+      });
+    });
+  },
+
+  editMerchant: function editMerchant(data) {
+    var def = _vow2['default'].defer();
+
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_EDIT_MERCHANT
+    });
+
+    _apiRestJs2['default'].editMerchant(data).then(function (response) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_EDIT_MERCHANT,
+        merchant: response.data
+      });
+
+      def.resolve();
+    });
+
+    return def.promise();
+  }
+};
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/MerchantStore.js":433,"underscore":349,"vow":350}],365:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -67920,7 +67992,122 @@ exports['default'] = {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":365,"../stores/RubricsStore.js":425,"underscore":349,"vow":350}],365:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/RubricsStore.js":434,"underscore":349,"vow":350}],366:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _apiRestJs = require('../api/rest.js');
+
+var _apiRestJs2 = _interopRequireDefault(_apiRestJs);
+
+var _storesSlidersStore = require('../stores/SlidersStore');
+
+var _storesSlidersStore2 = _interopRequireDefault(_storesSlidersStore);
+
+var _vow = require('vow');
+
+var _vow2 = _interopRequireDefault(_vow);
+
+exports['default'] = {
+  loadSliders: function loadSliders(id) {
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_LOAD_SLIDERS
+    });
+
+    return _apiRestJs2['default'].getSliders(id).then(function (response) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_LOAD_SLIDERS,
+        sliders: response.data
+      });
+    });
+  },
+
+  addSlider: function addSlider(data, form) {
+    var def = _vow2['default'].defer();
+
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_ADD_SLIDER
+    });
+
+    _apiRestJs2['default'].addSlider(data).then(function (response) {
+      _apiRestJs2['default'].upload('slider', response.data.id, 'slide', form).then(function (response) {
+        _Dispatcher2['default'].handleServerAction({
+          type: _Constants2['default'].ActionTypes.SUCCESS_ADD_SLIDER,
+          slider: response.data
+        });
+
+        def.resolve();
+      });
+    });
+
+    return def.promise();
+  },
+
+  editSlider: function editSlider(id, data, form) {
+    var def = _vow2['default'].defer();
+
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_EDIT_SLIDER
+    });
+
+    var defArr = [];
+
+    data.slides.forEach(function (item) {
+      if (!item['delete']) return;
+
+      var def = _vow2['default'].defer();
+      defArr.push(def.promise());
+
+      _apiRestJs2['default'].removeUpload('slider', id, 'slide', item.id).then(function (response) {
+        def.resolve(response);
+      });
+    });
+
+    defArr.push(_apiRestJs2['default'].upload('slider', id, 'slide', form));
+    defArr.push(_apiRestJs2['default'].editSlider(id, data));
+
+    _vow2['default'].all(defArr).then(function (all) {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_EDIT_SLIDER,
+        slider: all[all.length - 1].data
+      });
+
+      def.resolve();
+    });
+
+    return def.promise();
+  },
+
+  deleteSlider: function deleteSlider(id) {
+    _Dispatcher2['default'].handleServerAction({
+      type: _Constants2['default'].ActionTypes.START_DELETE_SLIDER
+    });
+
+    return _apiRestJs2['default'].deleteSlider(id).then(function () {
+      _Dispatcher2['default'].handleServerAction({
+        type: _Constants2['default'].ActionTypes.SUCCESS_DELETE_SLIDER,
+        id: id
+      });
+    });
+  }
+};
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"../api/rest.js":367,"../stores/SlidersStore":435,"vow":350}],367:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68362,6 +68549,66 @@ exports['default'] = (function (vow) {
       var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/myself-admin';
 
       return _jquery2['default'].get(url);
+    },
+
+    getMerchant: function getMerchant() {
+      var def = vow.defer();
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/merchant/1';
+
+      _jquery2['default'].ajax({
+        url: url,
+        type: 'get',
+        success: function success(result) {
+          def.resolve(result);
+        },
+        error: function error() {
+          def.reject();
+        }
+      });
+
+      return def.promise();
+    },
+    editMerchant: function editMerchant(data) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/merchant/1';
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'put',
+        data: data
+      });
+    },
+
+    getSliders: function getSliders(id) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/slider';
+      if (id) url += '/' + id;
+
+      return _jquery2['default'].get(url);
+    },
+    addSlider: function addSlider(data) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/slider';
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'POST',
+        data: data
+      });
+    },
+    editSlider: function editSlider(id, data) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/slider/' + id;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'put',
+        data: data
+      });
+    },
+    deleteSlider: function deleteSlider(id) {
+      var url = _Constants2['default'].ConfigSources.REST_BASE_URL + '/slider/' + id;
+
+      return _jquery2['default'].ajax({
+        url: url,
+        type: 'delete'
+      });
     }
   };
 })(_vow2['default']);
@@ -68369,7 +68616,7 @@ exports['default'] = (function (vow) {
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"jquery":6,"vow":350}],366:[function(require,module,exports){
+},{"../Constants":351,"jquery":6,"vow":350}],368:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68472,7 +68719,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../actions/AuthActionCreators.js":353,"../stores/UserStore.js":426,"./NavigationMenu.jsx":367,"react":348,"react-router":132}],367:[function(require,module,exports){
+},{"../actions/AuthActionCreators.js":353,"../stores/UserStore.js":436,"./NavigationMenu.jsx":369,"react":348,"react-router":132}],369:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68567,6 +68814,24 @@ exports['default'] = _react2['default'].createClass({
           { to: '/contacts' },
           'Contacts'
         )
+      ),
+      _react2['default'].createElement(
+        'p',
+        null,
+        _react2['default'].createElement(
+          _reactRouter.Link,
+          { to: '/merchant' },
+          'Merchant'
+        )
+      ),
+      _react2['default'].createElement(
+        'p',
+        null,
+        _react2['default'].createElement(
+          _reactRouter.Link,
+          { to: '/sliders' },
+          'Sliders'
+        )
       )
     );
   }
@@ -68574,7 +68839,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-bootstrap":75,"react-router":132}],368:[function(require,module,exports){
+},{"react":348,"react-bootstrap":75,"react-router":132}],370:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68666,7 +68931,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/AuthActionCreators.js":353,"../../stores/UserStore.js":426,"../../tools/FieldsGenerator.js":427,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],369:[function(require,module,exports){
+},{"../../actions/AuthActionCreators.js":353,"../../stores/UserStore.js":436,"../../tools/FieldsGenerator.js":437,"js-cookie":7,"react":348,"react-bootstrap":75,"react-router":132}],371:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68777,7 +69042,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],370:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":421,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],372:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68812,7 +69077,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],371:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],373:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68883,7 +69148,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"./Author.jsx":370,"react":348}],372:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":421,"./Author.jsx":372,"react":348}],374:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -68925,7 +69190,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./Authors.jsx":371,"react":348,"react-router":132}],373:[function(require,module,exports){
+},{"./Authors.jsx":373,"react":348,"react-router":132}],375:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69117,7 +69382,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":413,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],374:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../stores/AuthorsStore.js":421,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],376:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69438,7 +69703,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":364,"../../stores/AuthorsStore.js":413,"../../stores/BooksStore.js":417,"../../stores/CategoriesStore":418,"../../stores/CoverTypesStore.js":421,"../../stores/FormSideSchemasStore.js":422,"../../stores/FormatsStore.js":423,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],375:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":365,"../../stores/AuthorsStore.js":421,"../../stores/BooksStore.js":425,"../../stores/CategoriesStore":426,"../../stores/CoverTypesStore.js":429,"../../stores/FormSideSchemasStore.js":430,"../../stores/FormatsStore.js":431,"../../stores/RubricsStore.js":434,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],377:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69473,7 +69738,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],376:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],378:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69591,7 +69856,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],377:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":408,"react":348,"react-bootstrap":75,"react-router":132}],379:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69714,7 +69979,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/BookReasonsActionCreators.js":355,"../../stores/BookReasonsStore.js":415,"./BookReason.jsx":376,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],378:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/BookReasonsActionCreators.js":355,"../../stores/BookReasonsStore.js":423,"./BookReason.jsx":378,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],380:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69832,7 +70097,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],379:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"../helpers/UploadImage.jsx":408,"react":348,"react-bootstrap":75,"react-router":132}],381:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69956,7 +70221,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/BookReviewsActionCreators.js":356,"../../stores/BookReviewsStore.js":416,"./BookReview.jsx":378,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],380:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/BookReviewsActionCreators.js":356,"../../stores/BookReviewsStore.js":424,"./BookReview.jsx":380,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],382:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -69998,7 +70263,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./BooksList.jsx":381,"react":348,"react-router":132}],381:[function(require,module,exports){
+},{"./BooksList.jsx":383,"react":348,"react-router":132}],383:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70067,7 +70332,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/BooksActionCreators.js":357,"../../stores/BooksStore.js":417,"./Book.jsx":375,"react":348}],382:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/BooksActionCreators.js":357,"../../stores/BooksStore.js":425,"./Book.jsx":377,"react":348}],384:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70488,7 +70753,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":364,"../../stores/AuthorsStore.js":413,"../../stores/BooksStore.js":417,"../../stores/CategoriesStore":418,"../../stores/CoverTypesStore.js":421,"../../stores/FormSideSchemasStore.js":422,"../../stores/FormatsStore.js":423,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],383:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/AuthorsActionCreators.js":354,"../../actions/BooksActionCreators.js":357,"../../actions/CategoriesActionCreators.js":358,"../../actions/CoverTypesActionCreators.js":360,"../../actions/FormSideSchemasActionCreator.js":361,"../../actions/FormatsActionCreators.js":362,"../../actions/RubricsActionCreators.js":365,"../../stores/AuthorsStore.js":421,"../../stores/BooksStore.js":425,"../../stores/CategoriesStore":426,"../../stores/CoverTypesStore.js":429,"../../stores/FormSideSchemasStore.js":430,"../../stores/FormatsStore.js":431,"../../stores/RubricsStore.js":434,"../../tools/FieldsGenerator.js":437,"moment":8,"react":348,"react-bootstrap":75,"react-router":132,"underscore":349}],385:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70641,7 +70906,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/HeaderColorsStore":424,"./../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],384:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/HeaderColorsStore":432,"./../helpers/UploadImage.jsx":408,"react":348,"react-bootstrap":75,"react-router":132}],386:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70683,7 +70948,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./CategoriesList.jsx":385,"react":348,"react-router":132}],385:[function(require,module,exports){
+},{"./CategoriesList.jsx":387,"react":348,"react-router":132}],387:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70752,7 +71017,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CategoriesActionCreators.js":358,"../../stores/CategoriesStore":418,"./Category.jsx":386,"react":348}],386:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CategoriesActionCreators.js":358,"../../stores/CategoriesStore":426,"./Category.jsx":388,"react":348}],388:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -70787,7 +71052,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],387:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],389:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71011,7 +71276,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/CategoriesStore":418,"../../stores/HeaderColorsStore":424,"./../helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-router":132}],388:[function(require,module,exports){
+},{"../../actions/CategoriesActionCreators.js":358,"../../actions/HeaderColorsActionCreators.js":363,"../../stores/CategoriesStore":426,"../../stores/HeaderColorsStore":432,"./../helpers/UploadImage.jsx":408,"react":348,"react-bootstrap":75,"react-router":132}],390:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71039,14 +71304,14 @@ exports['default'] = _react2['default'].createClass({
     return _react2['default'].createElement(
       _reactRouter.Link,
       { to: 'edit-contact', params: { id: contact.id }, className: 'list-group-item' },
-      contact.name
+      contact.title
     );
   }
 });
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],389:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],391:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71088,7 +71353,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./ContactsList.jsx":390,"react":348,"react-router":132}],390:[function(require,module,exports){
+},{"./ContactsList.jsx":392,"react":348,"react-router":132}],392:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71157,7 +71422,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":420,"./Contact.jsx":388,"react":348}],391:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":428,"./Contact.jsx":390,"react":348}],393:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71202,18 +71467,6 @@ exports['default'] = _react2['default'].createClass({
 
     _actionsContactsActionCreatorsJs2['default'].loadContacts(contactId);
 
-    obj.deleteFields = {
-      emails: [],
-      phones: [],
-      postAddress: []
-    };
-
-    obj.newFields = {
-      emails: [],
-      phones: [],
-      postAddress: []
-    };
-
     return obj;
   },
 
@@ -71242,20 +71495,25 @@ exports['default'] = _react2['default'].createClass({
   },
 
   render: function render() {
-    var _state = this.state;
-    var form = _state.form;
-    var deleteFields = _state.deleteFields;
-    var newFields = _state.newFields;
+    var form = this.state.form;
 
     if (!form) return _react2['default'].createElement('div', null);
 
     var fields = [{
-      type: 'text',
+      type: 'email',
       label: 'Emails',
-      name: 'email',
-      array: 'emails',
-      newArray: newFields,
-      deleteArray: deleteFields
+      name: 'name',
+      array: 'emails'
+    }, {
+      type: 'tel',
+      label: 'Phones',
+      name: 'name',
+      array: 'phones'
+    }, {
+      type: 'text',
+      label: 'Post addresses',
+      name: 'name',
+      array: 'postAddresses'
     }];
 
     return _react2['default'].createElement(
@@ -71287,7 +71545,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":420,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],392:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/ContactsActionCreators.js":359,"../../stores/ContactsStore.js":428,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71396,7 +71654,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"react":348,"react-bootstrap":75,"react-router":132}],393:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":429,"react":348,"react-bootstrap":75,"react-router":132}],395:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71431,7 +71689,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],394:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],396:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71473,7 +71731,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./CoverTypesList.jsx":395,"react":348,"react-router":132}],395:[function(require,module,exports){
+},{"./CoverTypesList.jsx":397,"react":348,"react-router":132}],397:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71542,7 +71800,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"./CoverType.jsx":393,"react":348}],396:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":429,"./CoverType.jsx":395,"react":348}],398:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71728,7 +71986,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":421,"react":348,"react-bootstrap":75,"react-router":132}],397:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/CoverTypesActionCreators.js":360,"../../stores/CoverTypesStore.js":429,"react":348,"react-bootstrap":75,"react-router":132}],399:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71812,7 +72070,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],398:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],400:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -71979,7 +72237,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":423,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],399:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":431,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],401:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72014,7 +72272,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],400:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],402:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72056,7 +72314,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./FormatsList.jsx":401,"react":348,"react-router":132}],401:[function(require,module,exports){
+},{"./FormatsList.jsx":403,"react":348,"react-router":132}],403:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72125,7 +72383,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":423,"./Format.jsx":399,"react":348}],402:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/FormatsActionCreators.js":362,"../../stores/FormatsStore.js":431,"./Format.jsx":401,"react":348}],404:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72162,7 +72420,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-bootstrap":75}],403:[function(require,module,exports){
+},{"react":348,"react-bootstrap":75}],405:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72219,7 +72477,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-colorpicker":99}],404:[function(require,module,exports){
+},{"react":348,"react-colorpicker":99}],406:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72265,7 +72523,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"react":348,"react-datepicker":104}],405:[function(require,module,exports){
+},{"react":348,"react-datepicker":104}],407:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72369,7 +72627,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],406:[function(require,module,exports){
+},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],408:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72475,7 +72733,117 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],407:[function(require,module,exports){
+},{"../../Constants":351,"react":348,"react-bootstrap":75,"underscore":349}],409:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _actionsMerchantActionCreatorsJs = require('../../actions/MerchantActionCreators.js');
+
+var _actionsMerchantActionCreatorsJs2 = _interopRequireDefault(_actionsMerchantActionCreatorsJs);
+
+var _storesMerchantStoreJs = require('../../stores/MerchantStore.js');
+
+var _storesMerchantStoreJs2 = _interopRequireDefault(_storesMerchantStoreJs);
+
+var _ConstantsJs = require('../../Constants.js');
+
+var _ConstantsJs2 = _interopRequireDefault(_ConstantsJs);
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
+
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'EditMerchant',
+
+  mixins: [_reactRouter.Navigation],
+
+  getInitialState: function getInitialState() {
+    var obj = {};
+
+    _actionsMerchantActionCreatorsJs2['default'].loadMerchant();
+
+    return obj;
+  },
+
+  _onChange: function _onChange() {
+    this.setState(function (prev) {
+      var merchant = _storesMerchantStoreJs2['default'].get('merchant');
+
+      prev.form = merchant;
+
+      return prev;
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+    _storesMerchantStoreJs2['default'].addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    _storesMerchantStoreJs2['default'].removeChangeListener(this._onChange);
+  },
+
+  submit: function submit() {
+    _actionsMerchantActionCreatorsJs2['default'].editMerchant(this.state.form).then((function () {
+      this.transitionTo('hello');
+    }).bind(this));
+  },
+
+  render: function render() {
+    var form = this.state.form;
+
+    if (!form) return _react2['default'].createElement('div', null);
+
+    var fields = [{
+      type: 'number',
+      label: 'Merchant number',
+      name: 'number'
+    }];
+
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'div',
+        { className: 'form-group clearfix' },
+        _react2['default'].createElement(
+          'h2',
+          null,
+          'Merchant'
+        )
+      ),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
+      _react2['default'].createElement('hr', null),
+      _react2['default'].createElement(
+        _reactBootstrap.ButtonToolbar,
+        { className: 'pull-left' },
+        _react2['default'].createElement(
+          _reactBootstrap.Button,
+          { bsStyle: 'primary', onClick: this.submit },
+          'Edit merchant'
+        )
+      )
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../Constants.js":351,"../../actions/MerchantActionCreators.js":364,"../../stores/MerchantStore.js":433,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],410:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72577,7 +72945,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],408:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":365,"../../stores/RubricsStore.js":434,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],411:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72758,7 +73126,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"../../tools/FieldsGenerator.js":427,"react":348,"react-bootstrap":75,"react-router":132}],409:[function(require,module,exports){
+},{"../../Constants.js":351,"../../actions/RubricsActionCreators.js":365,"../../stores/RubricsStore.js":434,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],412:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72793,7 +73161,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],410:[function(require,module,exports){
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],413:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72862,7 +73230,7 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":364,"../../stores/RubricsStore.js":425,"./Rubric.jsx":409,"react":348}],411:[function(require,module,exports){
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/RubricsActionCreators.js":365,"../../stores/RubricsStore.js":434,"./Rubric.jsx":412,"react":348}],414:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -72904,7 +73272,441 @@ exports['default'] = _react2['default'].createClass({
 module.exports = exports['default'];
 
 
-},{"./Rubrics.jsx":410,"react":348,"react-router":132}],412:[function(require,module,exports){
+},{"./Rubrics.jsx":413,"react":348,"react-router":132}],415:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _actionsSlidersActionCreatorsJs = require('../../actions/SlidersActionCreators.js');
+
+var _actionsSlidersActionCreatorsJs2 = _interopRequireDefault(_actionsSlidersActionCreatorsJs);
+
+var _storesSlidersStoreJs = require('../../stores/SlidersStore.js');
+
+var _storesSlidersStoreJs2 = _interopRequireDefault(_storesSlidersStoreJs);
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+var _ConstantsJs = require('../../Constants.js');
+
+var _ConstantsJs2 = _interopRequireDefault(_ConstantsJs);
+
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
+
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'AddSlider',
+
+  mixins: [_reactRouter.Navigation],
+
+  getInitialState: function getInitialState() {
+    return {
+      form: {}
+    };
+  },
+
+  _onChange: function _onChange() {
+    this.setState(function (prev) {
+      return prev;
+    });
+  },
+
+  submit: function submit() {
+    var data = this.state.form;
+
+    var fileForms = {
+      slide: this.refs.sliderSlide.getDOMNode()
+    };
+
+    _actionsSlidersActionCreatorsJs2['default'].addSlider(data, fileForms).then((function (result) {
+      this.transitionTo('sliders');
+    }).bind(this));
+  },
+
+  render: function render() {
+    var form = this.state.form;
+
+    var fields = [{
+      type: 'text',
+      label: 'Enter slider name',
+      name: 'name'
+    }, {
+      type: 'text',
+      label: 'Enter slider title',
+      name: 'title'
+    }, {
+      type: 'uploadImage',
+      name: 'SliderSlide',
+      fieldName: 'slides',
+      help: 'Chose slider slide',
+      label: 'Slider slide',
+      multiple: true
+    }];
+
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'h2',
+        null,
+        'Add new slider'
+      ),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
+      _react2['default'].createElement('hr', null),
+      _react2['default'].createElement(
+        _reactBootstrap.Button,
+        { bsStyle: 'primary', onClick: this.submit },
+        'Add slider'
+      )
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../Constants.js":351,"../../actions/SlidersActionCreators.js":366,"../../stores/SlidersStore.js":435,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],416:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _actionsSlidersActionCreatorsJs = require('../../actions/SlidersActionCreators.js');
+
+var _actionsSlidersActionCreatorsJs2 = _interopRequireDefault(_actionsSlidersActionCreatorsJs);
+
+var _storesSlidersStoreJs = require('../../stores/SlidersStore.js');
+
+var _storesSlidersStoreJs2 = _interopRequireDefault(_storesSlidersStoreJs);
+
+var _ConstantsJs = require('../../Constants.js');
+
+var _ConstantsJs2 = _interopRequireDefault(_ConstantsJs);
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+var _toolsFieldsGeneratorJs = require('../../tools/FieldsGenerator.js');
+
+var _toolsFieldsGeneratorJs2 = _interopRequireDefault(_toolsFieldsGeneratorJs);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'EditSlider',
+
+  mixins: [_reactRouter.Navigation],
+
+  getInitialState: function getInitialState() {
+    var obj = {};
+
+    var SliderId = this.props.params.id;
+
+    _actionsSlidersActionCreatorsJs2['default'].loadSliders(SliderId);
+
+    obj.showDeleteModal = false;
+
+    return obj;
+  },
+
+  _onChange: function _onChange() {
+    this.setState(function (prev) {
+      var Slider = _storesSlidersStoreJs2['default'].getOne(this.props.params.id);
+
+      prev.form = Slider;
+
+      return prev;
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+    _storesSlidersStoreJs2['default'].addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    _storesSlidersStoreJs2['default'].removeChangeListener(this._onChange);
+  },
+
+  toggleDeleteModal: function toggleDeleteModal() {
+    this.setState({ showDeleteModal: !this.state.showDeleteModal });
+  },
+
+  submit: function submit() {
+    var data = this.state.form;
+
+    var fileForms = {
+      photo: this.refs.SliderPhoto.getDOMNode()
+    };
+
+    _actionsSlidersActionCreatorsJs2['default'].editSlider(this.props.params.id, data, fileForms).then((function () {
+      this.transitionTo('Sliders');
+    }).bind(this));
+  },
+
+  'delete': function _delete() {
+    this.toggleDeleteModal();
+
+    _actionsSlidersActionCreatorsJs2['default'].deleteSlider(this.props.params.id).then((function () {
+      this.transitionTo('Sliders');
+    }).bind(this));
+  },
+
+  render: function render() {
+    var form = this.state.form;
+
+    if (!form) return _react2['default'].createElement('div', null);
+
+    var fields = [{
+      type: 'text',
+      label: 'Enter slider name',
+      name: 'name'
+    }, {
+      type: 'text',
+      label: 'Enter slider title',
+      name: 'title'
+    }, {
+      type: 'uploadImage',
+      name: 'SliderSlide',
+      fieldName: 'slides',
+      help: 'Chose slider slide',
+      label: 'Slider slide',
+      images: form.slides,
+      multiple: true
+    }];
+
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'div',
+        { className: 'form-group clearfix' },
+        _react2['default'].createElement(
+          'h2',
+          null,
+          'Edit Slider'
+        )
+      ),
+      _toolsFieldsGeneratorJs2['default'].call(this, this.state, fields),
+      _react2['default'].createElement('hr', null),
+      _react2['default'].createElement(
+        _reactBootstrap.ButtonToolbar,
+        { className: 'pull-left' },
+        _react2['default'].createElement(
+          _reactBootstrap.Button,
+          { bsStyle: 'primary', onClick: this.submit },
+          'Edit Slider'
+        )
+      ),
+      _react2['default'].createElement(
+        _reactBootstrap.Button,
+        { bsStyle: 'danger', className: 'pull-right', onClick: this.toggleDeleteModal },
+        'Delete Slider'
+      ),
+      _react2['default'].createElement(
+        _reactBootstrap.Modal,
+        { show: this.state.showDeleteModal, onHide: this.toggleDeleteModal },
+        _react2['default'].createElement(
+          _reactBootstrap.Modal.Header,
+          { closeButton: true },
+          _react2['default'].createElement(
+            _reactBootstrap.Modal.Title,
+            null,
+            'Are you sure want to delete this Slider?'
+          )
+        ),
+        _react2['default'].createElement(
+          _reactBootstrap.Modal.Body,
+          null,
+          _react2['default'].createElement(
+            'h4',
+            null,
+            form.name
+          )
+        ),
+        _react2['default'].createElement(
+          _reactBootstrap.Modal.Footer,
+          null,
+          _react2['default'].createElement(
+            _reactBootstrap.Button,
+            { bsStyle: 'danger', onClick: this['delete'] },
+            'Delete'
+          ),
+          _react2['default'].createElement(
+            _reactBootstrap.Button,
+            { bsStyle: 'primary', onClick: this.toggleDeleteModal },
+            'Cancel'
+          )
+        )
+      )
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../Constants.js":351,"../../actions/SlidersActionCreators.js":366,"../../stores/SlidersStore.js":435,"../../tools/FieldsGenerator.js":437,"react":348,"react-bootstrap":75,"react-router":132}],417:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+require('../../../../node_modules/react/addons');
+
+var _reactBootstrap = require('react-bootstrap');
+
+var _reactRouter = require('react-router');
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'Slider',
+
+  render: function render() {
+    var slider = this.props.slider;
+
+    return _react2['default'].createElement(
+      _reactRouter.Link,
+      { to: 'edit-slider', params: { id: slider.id }, className: 'list-group-item' },
+      slider.title
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../../../node_modules/react/addons":176,"react":348,"react-bootstrap":75,"react-router":132}],418:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouter = require('react-router');
+
+var _SlidersListJsx = require('./SlidersList.jsx');
+
+var _SlidersListJsx2 = _interopRequireDefault(_SlidersListJsx);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'SlidersContainer',
+
+  render: function render() {
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'p',
+        { className: 'text-right' },
+        _react2['default'].createElement(
+          _reactRouter.Link,
+          { className: 'btn btn-primary', to: '/add-slider' },
+          'Add slider'
+        )
+      ),
+      _react2['default'].createElement(_SlidersListJsx2['default'], null)
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"./SlidersList.jsx":419,"react":348,"react-router":132}],419:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _SliderJsx = require('./Slider.jsx');
+
+var _SliderJsx2 = _interopRequireDefault(_SliderJsx);
+
+var _node_modulesReactBootstrapLibListGroup = require('../../../../node_modules/react-bootstrap/lib/ListGroup');
+
+var _node_modulesReactBootstrapLibListGroup2 = _interopRequireDefault(_node_modulesReactBootstrapLibListGroup);
+
+var _actionsSlidersActionCreatorsJs = require('../../actions/SlidersActionCreators.js');
+
+var _actionsSlidersActionCreatorsJs2 = _interopRequireDefault(_actionsSlidersActionCreatorsJs);
+
+var _storesSlidersStore = require('../../stores/SlidersStore');
+
+var _storesSlidersStore2 = _interopRequireDefault(_storesSlidersStore);
+
+exports['default'] = _react2['default'].createClass({
+  displayName: 'SlidersList',
+
+  getInitialState: function getInitialState() {
+    _actionsSlidersActionCreatorsJs2['default'].loadSliders();
+
+    return { sliders: _storesSlidersStore2['default'].getAll() };
+  },
+
+  createSlidersDom: function createSlidersDom(sliders) {
+    return sliders.map(function (slider) {
+      return _react2['default'].createElement(_SliderJsx2['default'], { slider: slider });
+    });
+  },
+
+  _onChange: function _onChange() {
+    this.setState({ sliders: _storesSlidersStore2['default'].getAll() });
+  },
+
+  componentDidMount: function componentDidMount() {
+    _storesSlidersStore2['default'].addChangeListener(this._onChange);
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    _storesSlidersStore2['default'].removeChangeListener(this._onChange);
+  },
+
+  render: function render() {
+    var sliders = this.state.sliders;
+
+    return _react2['default'].createElement(
+      _node_modulesReactBootstrapLibListGroup2['default'],
+      null,
+      this.createSlidersDom(sliders)
+    );
+  }
+});
+module.exports = exports['default'];
+
+
+},{"../../../../node_modules/react-bootstrap/lib/ListGroup":39,"../../actions/SlidersActionCreators.js":366,"../../stores/SlidersStore":435,"./Slider.jsx":417,"react":348}],420:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -73005,6 +73807,22 @@ var _componentsContactsEditContactJsx = require('./components/contacts/EditConta
 
 var _componentsContactsEditContactJsx2 = _interopRequireDefault(_componentsContactsEditContactJsx);
 
+var _componentsMerchantEditMerchantJsx = require('./components/merchant/EditMerchant.jsx');
+
+var _componentsMerchantEditMerchantJsx2 = _interopRequireDefault(_componentsMerchantEditMerchantJsx);
+
+var _componentsSlidersSlidersContainerJsx = require('./components/sliders/SlidersContainer.jsx');
+
+var _componentsSlidersSlidersContainerJsx2 = _interopRequireDefault(_componentsSlidersSlidersContainerJsx);
+
+var _componentsSlidersAddSliderJsx = require('./components/sliders/AddSlider.jsx');
+
+var _componentsSlidersAddSliderJsx2 = _interopRequireDefault(_componentsSlidersAddSliderJsx);
+
+var _componentsSlidersEditSliderJsx = require('./components/sliders/EditSlider.jsx');
+
+var _componentsSlidersEditSliderJsx2 = _interopRequireDefault(_componentsSlidersEditSliderJsx);
+
 var _componentsAuthAuthJsx = require('./components/auth/Auth.jsx');
 
 var _componentsAuthAuthJsx2 = _interopRequireDefault(_componentsAuthAuthJsx);
@@ -73056,8 +73874,12 @@ var routes = _react2['default'].createElement(
     _react2['default'].createElement(_reactRouter.Route, { name: 'formats', path: '/formats', handler: _componentsFormatsFormatsContainerJsx2['default'] }),
     _react2['default'].createElement(_reactRouter.Route, { name: 'edit-format', path: '/edit-format/:id', handler: _componentsFormatsEditFormatJsx2['default'] }),
     _react2['default'].createElement(_reactRouter.Route, { name: 'add-format', path: '/add-format', handler: _componentsFormatsAddFormatJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'sliders', path: '/sliders', handler: _componentsSlidersSlidersContainerJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'edit-slider', path: '/edit-slider/:id', handler: _componentsSlidersEditSliderJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'add-slider', path: '/add-slider', handler: _componentsSlidersAddSliderJsx2['default'] }),
     _react2['default'].createElement(_reactRouter.Route, { name: 'contacts', path: '/contacts', handler: _componentsContactsContactsContainerJsx2['default'] }),
-    _react2['default'].createElement(_reactRouter.Route, { name: 'edit-contact', path: '/edit-contact/:id', handler: _componentsContactsEditContactJsx2['default'] })
+    _react2['default'].createElement(_reactRouter.Route, { name: 'edit-contact', path: '/edit-contact/:id', handler: _componentsContactsEditContactJsx2['default'] }),
+    _react2['default'].createElement(_reactRouter.Route, { name: 'merchants', path: '/merchant', handler: _componentsMerchantEditMerchantJsx2['default'] })
 );
 
 (0, _reactRouter.run)(routes, _reactRouter.HashLocation, function (Root) {
@@ -73065,7 +73887,7 @@ var routes = _react2['default'].createElement(
 });
 
 
-},{"./components/AppContainer.jsx":366,"./components/auth/Auth.jsx":368,"./components/authors/AddAuthor.jsx":369,"./components/authors/AuthorsContainer.jsx":372,"./components/authors/EditAuthor.jsx":373,"./components/books/AddBook.jsx":374,"./components/books/BookReasons.jsx":377,"./components/books/BookReviews.jsx":379,"./components/books/BooksContainer.jsx":380,"./components/books/EditBook.jsx":382,"./components/categories/AddCategory.jsx":383,"./components/categories/CategoriesContainer.jsx":384,"./components/categories/EditCategory.jsx":387,"./components/contacts/ContactsContainer.jsx":389,"./components/contacts/EditContact.jsx":391,"./components/cover-types/AddCoverType.jsx":392,"./components/cover-types/CoverTypesContainer.jsx":394,"./components/cover-types/EditCoverType.jsx":396,"./components/formats/AddFormat.jsx":397,"./components/formats/EditFormat.jsx":398,"./components/formats/FormatsContainer.jsx":400,"./components/hello/Hello.jsx":402,"./components/rubrics/AddRubric.jsx":407,"./components/rubrics/EditRubric.jsx":408,"./components/rubrics/RubricsContainer.jsx":411,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],413:[function(require,module,exports){
+},{"./components/AppContainer.jsx":368,"./components/auth/Auth.jsx":370,"./components/authors/AddAuthor.jsx":371,"./components/authors/AuthorsContainer.jsx":374,"./components/authors/EditAuthor.jsx":375,"./components/books/AddBook.jsx":376,"./components/books/BookReasons.jsx":379,"./components/books/BookReviews.jsx":381,"./components/books/BooksContainer.jsx":382,"./components/books/EditBook.jsx":384,"./components/categories/AddCategory.jsx":385,"./components/categories/CategoriesContainer.jsx":386,"./components/categories/EditCategory.jsx":389,"./components/contacts/ContactsContainer.jsx":391,"./components/contacts/EditContact.jsx":393,"./components/cover-types/AddCoverType.jsx":394,"./components/cover-types/CoverTypesContainer.jsx":396,"./components/cover-types/EditCoverType.jsx":398,"./components/formats/AddFormat.jsx":399,"./components/formats/EditFormat.jsx":400,"./components/formats/FormatsContainer.jsx":402,"./components/hello/Hello.jsx":404,"./components/merchant/EditMerchant.jsx":409,"./components/rubrics/AddRubric.jsx":410,"./components/rubrics/EditRubric.jsx":411,"./components/rubrics/RubricsContainer.jsx":414,"./components/sliders/AddSlider.jsx":415,"./components/sliders/EditSlider.jsx":416,"./components/sliders/SlidersContainer.jsx":418,"jquery":6,"js-cookie":7,"react":348,"react-router":132}],421:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73145,7 +73967,7 @@ exports['default'] = AuthorStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],414:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],422:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73170,8 +73992,6 @@ var _underscore2 = _interopRequireDefault(_underscore);
 
 exports['default'] = (0, _objectAssign2['default'])({}, _events.EventEmitter.prototype, {
   // Allow Controller-View to register itself with store
-
-  _model: {},
 
   addChangeListener: function addChangeListener(callback) {
     this.on(_Constants2['default'].CHANGE_EVENT, callback);
@@ -73209,7 +74029,7 @@ exports['default'] = (0, _objectAssign2['default'])({}, _events.EventEmitter.pro
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"events":1,"object-assign":9,"underscore":349}],415:[function(require,module,exports){
+},{"../Constants":351,"events":1,"object-assign":9,"underscore":349}],423:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73290,7 +74110,7 @@ exports['default'] = BookReasonsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],416:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],424:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73371,7 +74191,7 @@ exports['default'] = BookReviewsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],417:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],425:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73451,7 +74271,7 @@ exports['default'] = BooksStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],418:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],426:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73531,7 +74351,7 @@ exports['default'] = CategoriesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],419:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],427:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73607,7 +74427,7 @@ exports['default'] = (0, _objectAssign2['default'])({}, _BaseStore2['default'], 
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"./BaseStore":414,"events":1,"object-assign":9,"underscore":349}],420:[function(require,module,exports){
+},{"../Constants":351,"./BaseStore":422,"events":1,"object-assign":9,"underscore":349}],428:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73664,7 +74484,7 @@ var ContactsStore = (0, _objectAssign2['default'])({}, _CollectionStore2['defaul
 
         break;
       case _Constants2['default'].ActionTypes.SUCCESS_EDIT_CONTACT:
-        ContactsStore.editItem(action.contacts);
+        ContactsStore.editItem(action.contact);
 
         ContactsStore.emitChange();
 
@@ -73687,7 +74507,7 @@ exports['default'] = ContactsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],421:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],429:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73767,7 +74587,7 @@ exports['default'] = CoverTypesStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],422:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],430:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73817,7 +74637,7 @@ exports['default'] = FormSideSchemasStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],423:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],431:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73897,7 +74717,7 @@ exports['default'] = FormatsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],424:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],432:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -73947,7 +74767,66 @@ exports['default'] = HeaderColorsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],425:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],433:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _BaseStore = require('./BaseStore');
+
+var _BaseStore2 = _interopRequireDefault(_BaseStore);
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var MerchantStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
+  _id: 'id',
+  _model: {},
+
+  dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
+    var action = payload.action;
+
+    switch (action.type) {
+      case _Constants2['default'].ActionTypes.START_LOAD_MERCHANT:
+        MerchantStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_LOAD_MERCHANT:
+        MerchantStore.set('merchant', action.merchant);
+        MerchantStore.emitChange();
+        break;
+      case _Constants2['default'].ActionTypes.START_EDIT_MERCHANT:
+        MerchantStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_EDIT_MERCHANT:
+        MerchantStore.set('merchant', action.merchant);
+
+        MerchantStore.emitChange();
+
+        break;
+    }
+  })
+});
+
+exports['default'] = MerchantStore;
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"./BaseStore":422,"object-assign":9}],434:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -74027,7 +74906,87 @@ exports['default'] = RubricsStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":419,"object-assign":9}],426:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],435:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Dispatcher = require('../Dispatcher');
+
+var _Dispatcher2 = _interopRequireDefault(_Dispatcher);
+
+var _Constants = require('../Constants');
+
+var _Constants2 = _interopRequireDefault(_Constants);
+
+var _CollectionStore = require('./CollectionStore');
+
+var _CollectionStore2 = _interopRequireDefault(_CollectionStore);
+
+var _objectAssign = require('object-assign');
+
+var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var CategoriesStore = (0, _objectAssign2['default'])({}, _CollectionStore2['default'], {
+  _id: 'id',
+
+  dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
+    var action = payload.action;
+
+    switch (action.type) {
+      case _Constants2['default'].ActionTypes.START_LOAD_CATEGORIES:
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_LOAD_CATEGORIES:
+        CategoriesStore.addItems(action.categories);
+
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_ADD_CATEGORY:
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_ADD_CATEGORY:
+        CategoriesStore.addItems(action.category);
+
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_EDIT_CATEGORY:
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_EDIT_CATEGORY:
+        CategoriesStore.editItem(action.category);
+
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.START_DELETE_CATEGORY:
+        CategoriesStore.emitChange();
+
+        break;
+      case _Constants2['default'].ActionTypes.SUCCESS_DELETE_CATEGORY:
+        CategoriesStore.deleteItem(action.id);
+
+        CategoriesStore.emitChange();
+
+        break;
+    }
+  })
+});
+
+exports['default'] = CategoriesStore;
+module.exports = exports['default'];
+
+
+},{"../Constants":351,"../Dispatcher":352,"./CollectionStore":427,"object-assign":9}],436:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -74054,6 +75013,7 @@ var _objectAssign2 = _interopRequireDefault(_objectAssign);
 
 var UserStore = (0, _objectAssign2['default'])({}, _BaseStore2['default'], {
   _id: 'id',
+  _model: {},
 
   dispatcherIndex: _Dispatcher2['default'].register(function (payload) {
     var action = payload.action;
@@ -74082,7 +75042,7 @@ exports['default'] = UserStore;
 module.exports = exports['default'];
 
 
-},{"../Constants":351,"../Dispatcher":352,"./BaseStore":414,"object-assign":9}],427:[function(require,module,exports){
+},{"../Constants":351,"../Dispatcher":352,"./BaseStore":422,"object-assign":9}],437:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -74146,6 +75106,25 @@ exports['default'] = function (obj, fields) {
     });
   }
 
+  function addNewValue(array, fieldName) {
+    this.setState(function (prev) {
+      var val = {};
+      val[fieldName] = '';
+
+      prev.form[array].push(val);
+
+      return prev;
+    });
+  }
+
+  function deleteValue(array, index) {
+    this.setState(function (prev) {
+      if (prev.form[array][index].id) prev.form[array][index]['delete'] = true;else prev.form[array].splice(index, 1);
+
+      return prev;
+    });
+  }
+
   function multipleSelectChange(fieldName) {
     this.setState(function (prev) {
       prev.selects[fieldName] = this.refs[fieldName].getValue();
@@ -74195,46 +75174,140 @@ exports['default'] = function (obj, fields) {
           label: field.label,
           ref: field.name,
           onChange: valueChange.bind(this, field.name) });else {
-          var fields = _underscore2['default'].map(form[field.array], function (form, index) {
+          var fields = _underscore2['default'].map(form[field.array], (function (form, index) {
+            if (form['delete']) return;
+
             return _react2['default'].createElement(
               'div',
-              null,
+              { className: 'form-group' },
               _react2['default'].createElement(_reactBootstrap.Input, {
                 type: field.type,
                 value: form[field.name],
-                label: field.label,
                 ref: field.array + index + field.name,
                 onChange: arrayValueChange.bind(this, field.array, index, field.name) }),
               _react2['default'].createElement(
                 _reactBootstrap.Button,
-                { bsStyle: 'danger' },
+                { onClick: deleteValue.bind(this, field.array, index), bsStyle: 'danger' },
                 'Delete'
               )
             );
-          });
+          }).bind(this));
 
           return _react2['default'].createElement(
             'div',
-            null,
+            { className: 'form-group' },
+            _react2['default'].createElement(
+              'div',
+              null,
+              _react2['default'].createElement(
+                'label',
+                null,
+                field.label
+              )
+            ),
             fields,
             _react2['default'].createElement(
               _reactBootstrap.Button,
-              null,
-              'Add new ',
-              field.name
+              { onClick: addNewValue.bind(this, field.array, field.name) },
+              'Add new'
             )
           );
         }
         break;
       case 'email':
-        return _react2['default'].createElement(_reactBootstrap.Input, {
+        if (!field.array) return _react2['default'].createElement(_reactBootstrap.Input, {
           type: field.type,
           value: form[field.name],
           label: field.label,
           ref: field.name,
-          onChange: valueChange.bind(this, field.name) });
-        break;
+          onChange: valueChange.bind(this, field.name) });else {
+          var fields = _underscore2['default'].map(form[field.array], (function (form, index) {
+            if (form['delete']) return;
 
+            return _react2['default'].createElement(
+              'div',
+              { className: 'form-group' },
+              _react2['default'].createElement(_reactBootstrap.Input, {
+                type: field.type,
+                value: form[field.name],
+                ref: field.array + index + field.name,
+                onChange: arrayValueChange.bind(this, field.array, index, field.name) }),
+              _react2['default'].createElement(
+                _reactBootstrap.Button,
+                { onClick: deleteValue.bind(this, field.array, index), bsStyle: 'danger' },
+                'Delete'
+              )
+            );
+          }).bind(this));
+
+          return _react2['default'].createElement(
+            'div',
+            { className: 'form-group' },
+            _react2['default'].createElement(
+              'div',
+              null,
+              _react2['default'].createElement(
+                'label',
+                null,
+                field.label
+              )
+            ),
+            fields,
+            _react2['default'].createElement(
+              _reactBootstrap.Button,
+              { onClick: addNewValue.bind(this, field.array, field.name) },
+              'Add new'
+            )
+          );
+        }
+        break;
+      case 'tel':
+        if (!field.array) return _react2['default'].createElement(_reactBootstrap.Input, {
+          type: field.type,
+          value: form[field.name],
+          label: field.label,
+          ref: field.name,
+          onChange: valueChange.bind(this, field.name) });else {
+          var fields = _underscore2['default'].map(form[field.array], (function (form, index) {
+            if (form['delete']) return;
+
+            return _react2['default'].createElement(
+              'div',
+              { className: 'form-group' },
+              _react2['default'].createElement(_reactBootstrap.Input, {
+                type: field.type,
+                value: form[field.name],
+                ref: field.array + index + field.name,
+                onChange: arrayValueChange.bind(this, field.array, index, field.name) }),
+              _react2['default'].createElement(
+                _reactBootstrap.Button,
+                { onClick: deleteValue.bind(this, field.array, index), bsStyle: 'danger' },
+                'Delete'
+              )
+            );
+          }).bind(this));
+
+          return _react2['default'].createElement(
+            'div',
+            { className: 'form-group' },
+            _react2['default'].createElement(
+              'div',
+              null,
+              _react2['default'].createElement(
+                'label',
+                null,
+                field.label
+              )
+            ),
+            fields,
+            _react2['default'].createElement(
+              _reactBootstrap.Button,
+              { onClick: addNewValue.bind(this, field.array, field.name) },
+              'Add new'
+            )
+          );
+        }
+        break;
       case 'password':
         return _react2['default'].createElement(_reactBootstrap.Input, {
           type: field.type,
@@ -74343,4 +75416,4 @@ exports['default'] = function (obj, fields) {
 module.exports = exports['default'];
 
 
-},{"../Constants.js":351,"../components/helpers/Colorpicker.jsx":403,"../components/helpers/Datepicker.jsx":404,"../components/helpers/UploadFile.jsx":405,"../components/helpers/UploadImage.jsx":406,"react":348,"react-bootstrap":75,"react-tinymce":150,"underscore":349}]},{},[412]);
+},{"../Constants.js":351,"../components/helpers/Colorpicker.jsx":405,"../components/helpers/Datepicker.jsx":406,"../components/helpers/UploadFile.jsx":407,"../components/helpers/UploadImage.jsx":408,"react":348,"react-bootstrap":75,"react-tinymce":150,"underscore":349}]},{},[420]);

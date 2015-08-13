@@ -35,7 +35,7 @@ const ContactsStore = assign({}, CollectionStore, {
 
         break;
       case Constants.ActionTypes.SUCCESS_EDIT_CONTACT:
-        ContactsStore.editItem(action.contacts)
+        ContactsStore.editItem(action.contact)
 
         ContactsStore.emitChange()
 

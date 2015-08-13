@@ -163,6 +163,35 @@ export default {
     START_DELETE_CONTACT: null,
     SUCCESS_DELETE_CONTACT: null,
 
+
+
+
+    START_LOAD_MERCHANT: null,
+    SUCCESS_LOAD_MERCHANT: null,
+
+    START_ADD_MERCHANT: null,
+    SUCCESS_ADD_MERCHANT: null,
+
+    START_EDIT_MERCHANT: null,
+    SUCCESS_EDIT_MERCHANT: null,
+
+    START_DELETE_MERCHANT: null,
+    SUCCESS_DELETE_MERCHANT: null,
+
+
+
+
+    START_LOAD_SLIDERS: null,
+    SUCCESS_LOAD_SLIDERS: null,
+
+    START_ADD_SLIDER: null,
+    SUCCESS_ADD_SLIDER: null,
+
+    START_EDIT_SLIDER: null,
+    SUCCESS_EDIT_SLIDER: null,
+
+    START_DELETE_SLIDER: null,
+    SUCCESS_DELETE_SLIDER: null,
   }),
 
   ActionSources: keyMirror({

@@ -9,7 +9,7 @@ export default React.createClass({
 
     return (
     <Link to="edit-contact" params={{id: contact.id}} className="list-group-item">
-      {contact.name}
+      {contact.title}
     </Link>
     );
   }

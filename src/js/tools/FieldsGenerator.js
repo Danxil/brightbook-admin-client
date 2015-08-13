@@ -1,5 +1,5 @@
 import React from 'react';
-import {Input, Button} from 'react-bootstrap';
+import {Input, Button, Col} from 'react-bootstrap';
 import Datepicker from '../components/helpers/Datepicker.jsx';
 import Colorpicker from '../components/helpers/Colorpicker.jsx';
 import UploadImage from '../components/helpers/UploadImage.jsx';
@@ -22,6 +22,28 @@ export default function(obj, fields) {
   function arrayValueChange(array, index, fieldName) {
     this.setState(function(prev) {
       prev.form[array][index][fieldName] = this.refs[array + index + fieldName].getValue()
+
+      return prev
+    })
+  }
+
+  function addNewValue(array, fieldName) {
+    this.setState(function(prev) {
+      var val = {}
+      val[fieldName] = ''
+
+      prev.form[array].push(val)
+
+      return prev
+    })
+  }
+
+  function deleteValue(array, index) {
+    this.setState(function(prev) {
+      if (prev.form[array][index].id)
+        prev.form[array][index].delete = true
+      else
+        prev.form[array].splice(index, 1)
 
       return prev
     })
@@ -80,36 +102,104 @@ export default function(obj, fields) {
             onChange={valueChange.bind(this, field.name)}/>)
         else {
           var fields = _.map(form[field.array], function(form, index) {
+            if (form.delete)
+              return
+
             return (
-              <div>
+              <div className="form-group">
                 <Input
                   type={field.type}
                   value={form[field.name]}
-                  label={field.label}
                   ref={field.array + index + field.name}
                   onChange={arrayValueChange.bind(this, field.array, index, field.name)}/>
-                <Button bsStyle="danger">Delete</Button>
+                <Button onClick={deleteValue.bind(this, field.array, index)} bsStyle="danger">Delete</Button>
               </div>
             )
-          })
+          }.bind(this))
 
           return (
-            <div>
+            <div className="form-group">
+              <div>
+                <label>{field.label}</label>
+              </div>
               {fields}
-              <Button>Add new {field.name}</Button>
+              <Button onClick={addNewValue.bind(this, field.array, field.name)}>Add new</Button>
             </div>
           )
         }
         break
       case 'email':
-        return (<Input
-          type={field.type}
-          value={form[field.name]}
-          label={field.label}
-          ref={field.name}
-          onChange={valueChange.bind(this, field.name)}/>)
-        break
+        if (!field.array)
+          return (<Input
+            type={field.type}
+            value={form[field.name]}
+            label={field.label}
+            ref={field.name}
+            onChange={valueChange.bind(this, field.name)}/>)
+        else {
+          var fields = _.map(form[field.array], function(form, index) {
+            if (form.delete)
+              return
 
+            return (
+              <div className="form-group">
+                <Input
+                  type={field.type}
+                  value={form[field.name]}
+                  ref={field.array + index + field.name}
+                  onChange={arrayValueChange.bind(this, field.array, index, field.name)}/>
+                <Button onClick={deleteValue.bind(this, field.array, index)} bsStyle="danger">Delete</Button>
+              </div>
+            )
+          }.bind(this))
+
+          return (
+            <div className="form-group">
+              <div>
+                <label>{field.label}</label>
+              </div>
+              {fields}
+              <Button onClick={addNewValue.bind(this, field.array, field.name)}>Add new</Button>
+            </div>
+          )
+        }
+        break
+      case 'tel':
+        if (!field.array)
+          return (<Input
+            type={field.type}
+            value={form[field.name]}
+            label={field.label}
+            ref={field.name}
+            onChange={valueChange.bind(this, field.name)}/>)
+        else {
+          var fields = _.map(form[field.array], function(form, index) {
+            if (form.delete)
+              return
+
+            return (
+              <div className="form-group">
+                <Input
+                  type={field.type}
+                  value={form[field.name]}
+                  ref={field.array + index + field.name}
+                  onChange={arrayValueChange.bind(this, field.array, index, field.name)}/>
+                <Button onClick={deleteValue.bind(this, field.array, index)} bsStyle="danger">Delete</Button>
+              </div>
+            )
+          }.bind(this))
+
+          return (
+            <div className="form-group">
+              <div>
+                <label>{field.label}</label>
+              </div>
+              {fields}
+              <Button onClick={addNewValue.bind(this, field.array, field.name)}>Add new</Button>
+            </div>
+          )
+        }
+        break
       case 'password':
         return (<Input
           type={field.type}

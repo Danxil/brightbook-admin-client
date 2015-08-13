@@ -1,6 +1,6 @@
 import React from 'react';
-import FormatsActionCreators from '../../actions/FormatsActionCreators.js';
-import FormatsStore from '../../stores/FormatsStore.js';
+import SlidersActionCreators from '../../actions/SlidersActionCreators.js';
+import SlidersStore from '../../stores/SlidersStore.js';
 import Constants from '../../Constants.js';
 import {Button, Input, Modal, ButtonToolbar} from 'react-bootstrap';
 import {Navigation, Link} from 'react-router';
@@ -12,9 +12,9 @@ export default React.createClass({
   getInitialState() {
     var obj = {}
 
-    let formatId = this.props.params.id
+    let SliderId = this.props.params.id
 
-    FormatsActionCreators.loadFormats(formatId)
+    SlidersActionCreators.loadSliders(SliderId)
 
     obj.showDeleteModal = false
 
@@ -23,20 +23,20 @@ export default React.createClass({
 
   _onChange() {
     this.setState(function(prev) {
-      var format = FormatsStore.getOne(this.props.params.id)
+      var Slider = SlidersStore.getOne(this.props.params.id)
 
-      prev.form = format
+      prev.form = Slider
 
       return prev
     })
   },
 
   componentDidMount() {
-    FormatsStore.addChangeListener(this._onChange);
+    SlidersStore.addChangeListener(this._onChange);
   },
 
   componentWillUnmount() {
-    FormatsStore.removeChangeListener(this._onChange);
+    SlidersStore.removeChangeListener(this._onChange);
   },
 
   toggleDeleteModal() {
@@ -44,16 +44,22 @@ export default React.createClass({
   },
 
   submit() {
-    FormatsActionCreators.editFormat(this.props.params.id, this.state.form).then(function() {
-      this.transitionTo('formats')
+    var data = this.state.form
+
+    var fileForms = {
+      photo: this.refs.SliderPhoto.getDOMNode(),
+    }
+
+    SlidersActionCreators.editSlider(this.props.params.id, data, fileForms).then(function() {
+      this.transitionTo('Sliders')
     }.bind(this))
   },
 
   delete() {
     this.toggleDeleteModal()
 
-    FormatsActionCreators.deleteFormat(this.props.params.id).then(function() {
-      this.transitionTo('formats')
+    SlidersActionCreators.deleteSlider(this.props.params.id).then(function() {
+      this.transitionTo('Sliders')
     }.bind(this))
   },
 
@@ -66,30 +72,44 @@ export default React.createClass({
     var fields = [
       {
         type: 'text',
-        label: 'Enter format',
+        label: 'Enter slider name',
         name: 'name',
-      }
+      },
+      {
+        type: 'text',
+        label: 'Enter slider title',
+        name: 'title',
+      },
+      {
+        type: 'uploadImage',
+        name: 'SliderSlide',
+        fieldName: 'slides',
+        help: 'Chose slider slide',
+        label: 'Slider slide',
+        images: form.slides,
+        multiple: true
+      },
     ]
 
     return (
       <div>
         <div className="form-group clearfix">
           <h2>
-            Edit format
+            Edit Slider
           </h2>
         </div>
         {FieldsGenerator.call(this, this.state, fields)}
         <hr/>
         <ButtonToolbar className="pull-left">
-          <Button bsStyle='primary' onClick={this.submit}>Edit format</Button>
+          <Button bsStyle='primary' onClick={this.submit}>Edit Slider</Button>
         </ButtonToolbar>
-        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete format</Button>
+        <Button bsStyle='danger' className="pull-right" onClick={this.toggleDeleteModal}>Delete Slider</Button>
 
 
 
         <Modal show={this.state.showDeleteModal} onHide={this.toggleDeleteModal}>
           <Modal.Header closeButton>
-            <Modal.Title>Are you sure want to delete this format?</Modal.Title>
+            <Modal.Title>Are you sure want to delete this Slider?</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h4>{form.name}</h4>
